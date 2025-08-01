@@ -147,6 +147,21 @@ export const useApi = () => {
     }
   }, []);
 
+  const reorderSlides = useCallback(async (projectId: number, slideUpdates: { id: number; position: number }[]) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.reorderSlides(projectId, slideUpdates);
+      return response;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Slide reorder failed';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const chatRequest = useCallback(async (request: ChatRequest): Promise<ChatResponse> => {
     setLoading(true);
     setError(null);
@@ -194,6 +209,7 @@ export const useApi = () => {
     getProject,
     createSlide,
     updateSlide,
+    reorderSlides,
     chatRequest,
     healthCheck,
   };

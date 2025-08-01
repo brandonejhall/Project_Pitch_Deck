@@ -101,6 +101,10 @@ export function Workspace({ initialSlides }: { initialSlides?: any[] }) {
       position: index + 1
     }));
     setSlides(updatedSlides);
+
+    // Note: This component doesn't have projectId, so we can't save to backend
+    // The workspace-new.tsx component handles the actual saving
+    // For this demo component, we just update the local state
   };
 
   const handleSendMessage = async (content: string, slideId?: string) => {

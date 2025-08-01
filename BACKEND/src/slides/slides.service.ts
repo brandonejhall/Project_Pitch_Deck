@@ -67,4 +67,31 @@ export class SlidesService {
       }
     });
   }
+
+  async updateSlidePositions(userId: number, projectId: number, slideUpdates: { id: number; position: number }[]) {
+    // Verify the project belongs to the user
+    const project = await this.prisma.project.findFirst({
+      where: {
+        id: projectId,
+        userId
+      }
+    });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    // Update all slides in a transaction
+    const updates = slideUpdates.map(update => 
+      this.prisma.slide.update({
+        where: { 
+          id: update.id,
+          projectId: projectId // Ensure slide belongs to this project
+        },
+        data: { position: update.position }
+      })
+    );
+
+    return this.prisma.$transaction(updates);
+  }
 } 

@@ -34,4 +34,18 @@ export class SlidesController {
     const userId = req.user.id;
     return this.slidesService.updateSlide(userId, slideId, updateData);
   }
+
+  @Patch('reorder/:projectId')
+  @ApiOperation({ summary: 'Update slide positions for reordering' })
+  @ApiResponse({ status: 200, description: 'Slide positions updated successfully' })
+  async updateSlidePositions(
+    @Param('projectId') projectId: string,
+    @Body() slideUpdates: { id: number; position: number }[],
+    @Request() req
+  ) {
+    const projectIdNum = parseInt(projectId);
+    // Use authenticated user from Firebase
+    const userId = req.user.id;
+    return this.slidesService.updateSlidePositions(userId, projectIdNum, slideUpdates);
+  }
 } 

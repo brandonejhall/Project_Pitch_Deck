@@ -107,6 +107,7 @@ export interface Slide {
   title: string;
   content: string;
   type: string;
+  position: number;
   projectId: number;
   createdAt: string;
   updatedAt: string;
@@ -294,6 +295,13 @@ class ApiClient {
     return this.request<Slide>(`/slides/${slideId}`, {
       method: 'PATCH',
       body: JSON.stringify(updateData),
+    });
+  }
+
+  async reorderSlides(projectId: number, slideUpdates: { id: number; position: number }[]): Promise<Slide[]> {
+    return this.request<Slide[]>(`/slides/reorder/${projectId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(slideUpdates),
     });
   }
 

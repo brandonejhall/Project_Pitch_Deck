@@ -99,7 +99,9 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
   const [viewMode, setViewMode] = useState<'slides' | 'workspace'>('slides');
   const [triggerEditSlide, setTriggerEditSlide] = useState<{ slideId: string; fields: ('title' | 'content')[] } | null>(null);
   const [projectTitle, setProjectTitle] = useState('Untitled Project');
-  const { updateSlide, loading, error, getProject } = useApi();
+  const [hasUnsavedOrder, setHasUnsavedOrder] = useState(false);
+  const [originalSlides, setOriginalSlides] = useState<Slide[]>([]);
+  const { updateSlide, loading, error, getProject, reorderSlides } = useApi();
 
   // Load project slides if projectId is provided
   useEffect(() => {
@@ -109,44 +111,25 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
   }, [projectId]);
 
   const loadProjectSlides = async () => {
+    if (!projectId) return;
+    
     try {
-      console.log('🔍 Loading project slides for projectId:', projectId);
-      const project: any = await getProject(projectId);
-      console.log('📋 Project data:', project);
+      const project = await getProject(projectId);
+      const projectSlides = project.slides.map(slide => ({
+        id: slide.id.toString(),
+        position: slide.position,
+        title: slide.title,
+        content: slide.content,
+        layout: 'full-width' as const,
+        icon: 'default' as const
+      }));
       
-      // Set the project title
-      if (project.title) {
-        setProjectTitle(project.title);
-      }
-      
-      // Check if project has slides
-      if (project.slides && project.slides.length > 0) {
-        console.log(`✅ Found ${project.slides.length} slides in project`);
-        // Convert backend slides to frontend format
-        const loadedSlides: Slide[] = project.slides.map((slide: any) => ({
-          id: slide.id, // This should be an integer from the backend
-          position: slide.position,
-          title: slide.title,
-          content: slide.content,
-          layout: 'two-column', // Default layout
-          icon: 'default'
-        }));
-        
-        console.log('🔄 Converted slides:', loadedSlides);
-        setSlides(loadedSlides);
-        setActiveSlideId(loadedSlides[0]?.id || '');
-      } else {
-        // No slides found, use mock slides
-        console.log('❌ No slides found for project, using mock slides');
-        console.log('📋 Project slides array:', project.slides);
-      }
+      setSlides(projectSlides);
+      setOriginalSlides(projectSlides);
+      setProjectTitle(project.title);
+      setActiveSlideId(projectSlides[0]?.id || '');
     } catch (error) {
-      console.error('❌ Failed to load project slides:', error);
-      toast({
-        title: "Failed to load project",
-        description: "Could not load project slides. Using default slides.",
-        variant: "destructive",
-      });
+      console.error('Failed to load project slides:', error);
     }
   };
 
@@ -294,6 +277,55 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
       position: index + 1
     }));
     setSlides(updatedSlides);
+    
+    // Check if order has changed from original
+    const hasChanged = JSON.stringify(updatedSlides.map(s => ({ id: s.id, position: s.position }))) !== 
+                      JSON.stringify(originalSlides.map(s => ({ id: s.id, position: s.position })));
+    
+    setHasUnsavedOrder(hasChanged);
+  };
+
+  const handleSaveOrder = async () => {
+    if (!projectId || !hasUnsavedOrder) return;
+    
+    try {
+      const slideUpdates = slides.map(slide => ({
+        id: typeof slide.id === 'string' ? parseInt(slide.id.replace('slide-', '')) : slide.id,
+        position: slide.position
+      }));
+      
+      await reorderSlides(projectId, slideUpdates);
+      
+      // Update original slides to match current state
+      setOriginalSlides(slides);
+      setHasUnsavedOrder(false);
+      
+      // Show success feedback
+      toast({
+        title: "Order Saved",
+        description: "Slide order has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Failed to save slide order:', error);
+      
+      // Show error feedback
+      toast({
+        title: "Save Failed",
+        description: "Failed to save slide order. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelOrder = () => {
+    // Revert to original order
+    setSlides(originalSlides);
+    setHasUnsavedOrder(false);
+    
+    toast({
+      title: "Order Reverted",
+      description: "Slide order has been reverted to original.",
+    });
   };
 
   const handleSendMessage = async (content: string, slideId?: string) => {
@@ -446,8 +478,26 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
             </button>
           </div>
           
-          <div className="text-sm text-gray-500">
-            {slides.length} slides • {viewMode === 'slides' ? 'Full presentation view' : 'Edit mode'}
+          <div className="flex items-center space-x-2">
+            {hasUnsavedOrder && (
+              <>
+                <button
+                  onClick={handleSaveOrder}
+                  className="px-3 py-1 bg-green-100 text-green-700 rounded-md text-sm font-medium hover:bg-green-200 transition-colors"
+                >
+                  ✓ Save Order
+                </button>
+                <button
+                  onClick={handleCancelOrder}
+                  className="px-3 py-1 bg-red-100 text-red-700 rounded-md text-sm font-medium hover:bg-red-200 transition-colors"
+                >
+                  ✕ Cancel
+                </button>
+              </>
+            )}
+            <div className="text-sm text-gray-500">
+              {slides.length} slides • {viewMode === 'slides' ? 'Full presentation view' : 'Edit mode'}
+            </div>
           </div>
         </div>
       </div>
