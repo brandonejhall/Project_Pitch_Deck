@@ -18,7 +18,7 @@ export class GenerateController {
   ) {}
 
   @Post()
-  @UseGuards(FirebaseAuthGuard) // Enable Firebase auth
+  @UseGuards(FirebaseAuthGuard)
   @ApiOperation({ summary: 'Generate pitch deck slides' })
   @ApiResponse({ status: 200, description: 'Slides generated successfully' })
   async generateSlides(@Body() body: GenerateRequestDto, @Request() req): Promise<GenerateResponse> {
@@ -58,21 +58,51 @@ export class GenerateController {
 
   @Get('test')
   @ApiOperation({ summary: 'Test OpenAI API connection' })
-  @ApiResponse({ status: 200, description: 'API test completed' })
   async testApi() {
     try {
-      const testSlides = await this.aiService.generatePitchDeck('Test business idea');
+      const result = await this.aiService.generatePitchDeck('Test prompt');
       return { 
-        success: true, 
+        status: 'success',
         message: 'OpenAI API is working',
-        slideCount: testSlides.length 
+        slidesGenerated: result.length
       };
     } catch (error) {
       return { 
-        success: false, 
+        status: 'error',
         message: 'OpenAI API test failed',
         error: error.message 
       };
     }
+  }
+
+  @Get('health')
+  @ApiOperation({ summary: 'Health check endpoint' })
+  async healthCheck() {
+    console.log('🏥 Health check endpoint called');
+    
+    return {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      firebaseInitialized: !!process.env.FIREBASE_SERVICE_ACCOUNT_BASE64
+    };
+  }
+
+  @Get('auth-test')
+  @UseGuards(FirebaseAuthGuard)
+  @ApiOperation({ summary: 'Test Firebase authentication' })
+  async testAuth(@Request() req) {
+    console.log('🔐 Auth test endpoint called');
+    console.log('👤 User from request:', req.user);
+    
+    return {
+      status: 'success',
+      message: 'Firebase authentication is working',
+      user: {
+        id: req.user.id,
+        email: req.user.email,
+        firebaseUid: req.user.firebaseUid
+      }
+    };
   }
 } 

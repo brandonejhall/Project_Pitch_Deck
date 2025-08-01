@@ -147,6 +147,12 @@ class ApiClient {
     if (firebaseToken) {
       headers['Authorization'] = `Bearer ${firebaseToken}`;
       console.log('🔑 Using Firebase token for authentication');
+      console.log('📝 Token length:', firebaseToken.length);
+      console.log('📝 Token preview:', firebaseToken.substring(0, 20) + '...');
+      
+      // Log approximate token expiration (tokens typically last 1 hour)
+      const approximateExpiration = new Date(Date.now() + 3600000);
+      console.log('⏰ Approximate token expiration:', approximateExpiration.toISOString());
     } else {
       console.log('⚠️ No Firebase token available');
       throw new Error('Authentication required');
@@ -168,6 +174,7 @@ class ApiClient {
         const refreshedToken = await getIdToken(true);
         
         if (refreshedToken && refreshedToken !== firebaseToken) {
+          console.log('🔄 Token refreshed, retrying request...');
           // Retry with new token
           headers['Authorization'] = `Bearer ${refreshedToken}`;
           const retryResponse = await fetch(url, { ...config, headers });
@@ -179,6 +186,8 @@ class ApiClient {
           }
           
           return await retryResponse.json();
+        } else {
+          console.log('❌ Token refresh failed or returned same token');
         }
       }
       
