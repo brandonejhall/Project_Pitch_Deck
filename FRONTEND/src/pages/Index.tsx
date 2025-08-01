@@ -68,7 +68,12 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Sparkles className="w-6 h-6 text-primary" />
-              <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
+              <span 
+                className="text-section font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => navigate('/')}
+              >
+                PitchDeck AI
+              </span>
             </div>
             
             <div className="flex items-center gap-4">

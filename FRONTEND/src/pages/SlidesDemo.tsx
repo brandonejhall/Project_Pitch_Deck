@@ -6,11 +6,13 @@ import { Switch } from '../components/ui/switch';
 import { Label } from '../components/ui/label';
 import { LogOut, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export function SlidesDemo() {
   const [showNoise, setShowNoise] = useState(true);
   const [layout, setLayout] = useState<'two-column' | 'single'>('two-column');
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const sampleProjects: Project[] = [
     {
@@ -85,7 +87,12 @@ export function SlidesDemo() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Sparkles className="w-6 h-6 text-primary" />
-              <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
+              <span 
+                className="text-section font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => navigate('/')}
+              >
+                PitchDeck AI
+              </span>
             </div>
             
             <div className="flex items-center gap-4">

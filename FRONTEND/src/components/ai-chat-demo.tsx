@@ -5,6 +5,7 @@ import { ChatMessage } from '@/types/slide';
 import { LogOut, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Sample slide for demo
 const demoSlide: Slide = {
@@ -21,7 +22,7 @@ const sampleMessages: ChatMessage[] = [
   {
     id: 'msg-1',
     role: 'assistant',
-    content: 'Hi! I\'m your AI slide editor. I can help you improve your slides by:\n\n• Making content more persuasive\n• Adding hero images\n• Improving titles and descriptions\n• Suggesting better layouts\n\nTry asking me to "make this slide more compelling" or "add a hero image"!',
+    content: 'I\'m here to help you improve your pitch deck. I can only edit the active slide you have selected. What would you like to work on?',
     timestamp: new Date(Date.now() - 60000), // 1 minute ago
   }
 ];
@@ -39,6 +40,7 @@ export function AiChatDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>(sampleMessages);
   const [slide, setSlide] = useState<Slide>(demoSlide);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleSendMessage = (content: string, slideId?: string) => {
     const newMessage: ChatMessage = {
@@ -70,7 +72,12 @@ export function AiChatDemo() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Sparkles className="w-6 h-6 text-primary" />
-              <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
+              <span 
+                className="text-section font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => navigate('/')}
+              >
+                PitchDeck AI
+              </span>
             </div>
             
             <div className="flex items-center gap-4">

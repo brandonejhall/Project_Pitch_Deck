@@ -49,22 +49,8 @@ const mockMessages: ChatMessage[] = [
   {
     id: 'msg-1',
     role: 'assistant',
-    content: 'Hi! I\'m here to help you improve your pitch deck. What would you like to work on?',
+    content: 'I\'m here to help you improve your pitch deck. I can only edit the active slide you have selected. What would you like to work on?',
     timestamp: new Date(Date.now() - 300000), // 5 minutes ago
-  },
-  {
-    id: 'msg-2',
-    role: 'user',
-    content: 'Can you help me make the problem slide more compelling?',
-    timestamp: new Date(Date.now() - 240000), // 4 minutes ago
-    slideId: 'slide-2'
-  },
-  {
-    id: 'msg-3',
-    role: 'assistant',
-    content: 'Absolutely! For the problem slide, consider adding specific statistics or customer pain points. You could also include a real customer quote or case study to make it more relatable.',
-    timestamp: new Date(Date.now() - 180000), // 3 minutes ago
-    slideId: 'slide-2'
   }
 ];
 
@@ -134,7 +120,7 @@ export function Workspace({ initialSlides }: { initialSlides?: any[] }) {
       const aiMessage: ChatMessage = {
         id: `msg-${Date.now()}-ai`,
         role: 'assistant',
-        content: 'Great question! Here are some suggestions to improve that section...',
+        content: 'Working on your request...',
         timestamp: new Date(),
         slideId
       };
