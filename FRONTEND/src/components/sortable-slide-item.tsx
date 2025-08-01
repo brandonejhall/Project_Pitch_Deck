@@ -1,5 +1,5 @@
 import { Slide } from '@/types/slide';
-import { getSlideIcon } from '@/lib/slide-icons';
+import { detectSlideIcon, iconStyles } from '@/lib/slide-icons';
 import { GripVertical, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,8 +44,9 @@ export function SortableSlideItem({
     isDragging,
   } = useSortable({ id: slide.id });
 
-  const iconMapping = getSlideIcon(slide.icon);
+  const iconMapping = detectSlideIcon(slide.title, slide.content);
   const IconComponent = iconMapping.icon;
+  const iconStyle = iconStyles[iconMapping.key as keyof typeof iconStyles] || iconStyles.default;
   const isEditing = editingId === slide.id;
 
   const style = {
@@ -81,7 +82,9 @@ export function SortableSlideItem({
       </div>
       
       {/* Icon */}
-      <IconComponent className={`w-5 h-5 ${iconMapping.colorClass} flex-shrink-0`} />
+      <div className={`w-5 h-5 p-1 rounded ${iconStyle} flex-shrink-0`}>
+        <IconComponent className="w-full h-full" />
+      </div>
       
       {/* Title */}
       <div className="flex-1 min-w-0">

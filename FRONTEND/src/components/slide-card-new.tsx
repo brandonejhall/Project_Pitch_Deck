@@ -4,6 +4,7 @@ import { generateGradientConfig, generateThemeTokens } from '../lib/gradient-uti
 import { useResponsive } from '../hooks/use-responsive';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { slideIcons, iconStyles, detectSlideIcon } from '../lib/slide-icons';
 
 export interface Contact {
   type: 'email' | 'phone' | 'linkedin';
@@ -82,20 +83,24 @@ function ContactIcon({ type }: { type: Contact['type'] }) {
   }
 }
 
-// Abstract placeholder for when no hero image is provided
-function AbstractPlaceholder({ accentColor }: { accentColor: string }) {
+// Slide icon component to replace hero images
+function SlideIcon({ title, body, accentColor }: { title: string; body: string; accentColor: string }) {
+  const { key, icon: IconComponent } = detectSlideIcon(title, body);
+  const iconStyle = iconStyles[key as keyof typeof iconStyles] || iconStyles.default;
+  
   return (
-    <div className="relative w-full h-full rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+    <div className="relative w-full h-full rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className={`p-6 rounded-2xl border-2 ${iconStyle} shadow-lg`}>
+        <IconComponent className="w-16 h-16" />
+      </div>
+      
+      {/* Decorative elements */}
       <div 
-        className="w-24 h-24 rounded-full opacity-20"
+        className="absolute top-4 right-4 w-8 h-8 rounded-full opacity-20"
         style={{ backgroundColor: accentColor }}
       />
       <div 
-        className="absolute top-4 right-4 w-12 h-12 rounded-lg opacity-15"
-        style={{ backgroundColor: accentColor }}
-      />
-      <div 
-        className="absolute bottom-4 left-4 w-16 h-8 rounded-full opacity-10"
+        className="absolute bottom-4 left-4 w-12 h-6 rounded-full opacity-15"
         style={{ backgroundColor: accentColor }}
       />
     </div>
@@ -340,7 +345,7 @@ export function SlideCard({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <AbstractPlaceholder accentColor={theme.accent} />
+                    <SlideIcon title={project.title} body={project.body} accentColor={theme.accent} />
                   )}
                 </div>
               </div>

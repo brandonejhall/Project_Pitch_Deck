@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Slide } from '@/types/slide';
-import { getSlideIcon } from '@/lib/slide-icons';
+import { detectSlideIcon, iconStyles } from '@/lib/slide-icons';
 import { Plus, GripVertical, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Slide } from '@/types/slide';
-import { getSlideIcon } from '@/lib/slide-icons';
+import { detectSlideIcon, iconStyles } from '@/lib/slide-icons';
 import { MeshGradient } from './mesh-gradient';
 import { Mail, Phone, Linkedin, Edit3, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,8 +18,9 @@ interface SlideCardProps {
 }
 
 export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTitle, triggerEditContent, onEditTriggered }: SlideCardProps) {
-  const iconMapping = getSlideIcon(slide.icon);
+  const iconMapping = detectSlideIcon(slide.title, slide.content);
   const IconComponent = iconMapping.icon;
+  const iconStyle = iconStyles[iconMapping.key as keyof typeof iconStyles] || iconStyles.default;
   const { updateSlide, loading } = useApi();
   
   const [editingTitle, setEditingTitle] = useState(false);
@@ -202,7 +203,9 @@ export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTit
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <IconComponent className={`w-8 h-8 ${iconMapping.colorClass} flex-shrink-0`} />
+                <div className={`w-8 h-8 p-1 rounded ${iconStyle} flex-shrink-0`}>
+  <IconComponent className="w-full h-full" />
+</div>
                 {renderEditableTitle()}
               </div>
               {renderEditableContent()}
@@ -216,7 +219,9 @@ export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTit
                 />
               ) : (
                 <div className="w-full h-64 lg:h-80 glass-card flex items-center justify-center">
-                  <IconComponent className={`w-16 h-16 ${iconMapping.colorClass} opacity-50`} />
+                  <div className={`w-16 h-16 p-3 rounded ${iconStyle} opacity-50`}>
+  <IconComponent className="w-full h-full" />
+</div>
                 </div>
               )}
             </div>
@@ -228,7 +233,9 @@ export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTit
           <div className="flex items-center justify-center h-full text-center content-overlay">
             <div className="space-y-6 max-w-4xl">
               <div className="flex items-center justify-center gap-4 mb-8">
-                <IconComponent className={`w-12 h-12 ${iconMapping.colorClass}`} />
+                <div className={`w-12 h-12 p-2 rounded ${iconStyle}`}>
+  <IconComponent className="w-full h-full" />
+</div>
               </div>
               {renderEditableTitle()}
               {renderEditableContent()}
@@ -240,7 +247,9 @@ export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTit
         return (
           <div className="space-y-8">
             <div className="flex items-center gap-4">
-              <IconComponent className={`w-8 h-8 ${iconMapping.colorClass}`} />
+              <div className={`w-8 h-8 p-1 rounded ${iconStyle}`}>
+                <IconComponent className="w-full h-full" />
+              </div>
               {renderEditableTitle()}
             </div>
             {renderEditableContent()}
@@ -252,7 +261,9 @@ export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTit
         return (
           <div className="space-y-8">
             <div className="flex items-center gap-4">
-              <IconComponent className={`w-8 h-8 ${iconMapping.colorClass}`} />
+              <div className={`w-8 h-8 p-1 rounded ${iconStyle}`}>
+                <IconComponent className="w-full h-full" />
+              </div>
               {renderEditableTitle()}
             </div>
             {renderEditableContent()}
@@ -263,7 +274,9 @@ export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTit
         return (
           <div className="space-y-8">
             <div className="flex items-start gap-4">
-              <IconComponent className={`w-8 h-8 ${iconMapping.colorClass} flex-shrink-0 mt-1`} />
+              <div className={`w-8 h-8 p-1 rounded ${iconStyle} flex-shrink-0 mt-1`}>
+                <IconComponent className="w-full h-full" />
+              </div>
               {renderEditableTitle()}
             </div>
             {renderEditableContent()}

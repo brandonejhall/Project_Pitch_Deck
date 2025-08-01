@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from '@/types/slide';
 import { Slide } from '@/types/slide';
-import { getSlideIcon } from '@/lib/slide-icons';
+import { detectSlideIcon, iconStyles } from '@/lib/slide-icons';
 import { Send, Bot, User, Check, X, RotateCcw, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -161,7 +161,7 @@ export function ChatSidebarEnhanced({
     });
   };
 
-  const activeSlideIcon = activeSlide ? getSlideIcon() : null;
+  const activeSlideIcon = activeSlide ? detectSlideIcon(activeSlide.title, activeSlide.content) : null;
 
   const formatUpdateSummary = (updates: any) => {
     const changes = [];
@@ -182,7 +182,9 @@ export function ChatSidebarEnhanced({
           <h2 className="text-section text-gray-900">AI Assistant</h2>
           {activeSlide && activeSlideIcon && (
             <div className="flex items-center gap-2 text-footer text-gray-500">
-              <activeSlideIcon.icon className={`w-3 h-3 ${activeSlideIcon.colorClass}`} />
+              <div className={`w-3 h-3 p-0.5 rounded ${iconStyles[activeSlideIcon.key as keyof typeof iconStyles] || iconStyles.default}`}>
+                <activeSlideIcon.icon className="w-full h-full" />
+              </div>
               <span>Context: {activeSlide.title}</span>
             </div>
           )}
