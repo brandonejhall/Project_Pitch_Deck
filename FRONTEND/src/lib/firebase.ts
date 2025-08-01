@@ -1,15 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
 
-// Your Firebase configuration
+// Remove hardcoded fallbacks for production
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBD5EzPOvj2-Tews-Z2bFNDgrG4muvSBpg",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ai-pitch-deck-a5bc6.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ai-pitch-deck-a5bc6",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "ai-pitch-deck-a5bc6.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "409109309184",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:409109309184:web:25db376b7614bc9715f5e5",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-SEW97L2D4V"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
@@ -48,11 +48,16 @@ export const getCurrentUser = (): User | null => {
   return auth.currentUser;
 };
 
-// Get ID token for API requests
-export const getIdToken = async (): Promise<string | null> => {
+// Get ID token for API requests with force refresh
+export const getIdToken = async (forceRefresh: boolean = false): Promise<string | null> => {
   const user = auth.currentUser;
   if (user) {
-    return await user.getIdToken();
+    try {
+      return await user.getIdToken(forceRefresh);
+    } catch (error) {
+      console.error('Error getting ID token:', error);
+      return null;
+    }
   }
   return null;
 };

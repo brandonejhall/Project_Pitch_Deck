@@ -47,6 +47,7 @@ export class FirebaseService implements OnModuleInit {
         emailVerified: decodedToken.email_verified || false,
       };
     } catch (error) {
+      console.error('Firebase token verification failed:', error);
       throw new Error('Invalid Firebase ID token');
     }
   }

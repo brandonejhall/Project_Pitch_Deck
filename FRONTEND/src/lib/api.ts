@@ -129,15 +129,27 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
+    console.log(' Making API request to:', url);
+    
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-    // Add Firebase ID token to authorization header
-    const firebaseToken = await getIdToken();
+    // Get Firebase ID token with retry logic
+    let firebaseToken = await getIdToken(false); // Try without force refresh first
+    
+    if (!firebaseToken) {
+      console.log('🔄 No token found, trying force refresh...');
+      firebaseToken = await getIdToken(true); // Force refresh
+    }
+    
     if (firebaseToken) {
       headers['Authorization'] = `Bearer ${firebaseToken}`;
+      console.log('🔑 Using Firebase token for authentication');
+    } else {
+      console.log('⚠️ No Firebase token available');
+      throw new Error('Authentication required');
     }
 
     const config: RequestInit = {
@@ -148,14 +160,37 @@ class ApiClient {
     try {
       const response = await fetch(url, config);
       
+      console.log('✅ Response status:', response.status);
+      
+      if (response.status === 401) {
+        // Token might be expired, try force refresh
+        console.log('🔄 401 error, trying token refresh...');
+        const refreshedToken = await getIdToken(true);
+        
+        if (refreshedToken && refreshedToken !== firebaseToken) {
+          // Retry with new token
+          headers['Authorization'] = `Bearer ${refreshedToken}`;
+          const retryResponse = await fetch(url, { ...config, headers });
+          
+          if (!retryResponse.ok) {
+            const errorText = await retryResponse.text();
+            console.error('❌ API Error Response after retry:', errorText);
+            throw new Error(`HTTP error! status: ${retryResponse.status}`);
+          }
+          
+          return await retryResponse.json();
+        }
+      }
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ API Error Response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error(' API request failed:', error);
       throw error;
     }
   }
