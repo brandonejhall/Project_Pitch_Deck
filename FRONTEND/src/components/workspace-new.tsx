@@ -111,6 +111,7 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
   const [activeSlideId, setActiveSlideId] = useState(slides[0]?.id || '');
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
   const [viewMode, setViewMode] = useState<'slides' | 'workspace'>('slides');
+  const [triggerEditSlide, setTriggerEditSlide] = useState<{ slideId: string; fields: ('title' | 'content')[] } | null>(null);
   const { updateSlide, loading, error, getProject } = useApi();
 
   // Load project slides if projectId is provided
@@ -197,6 +198,60 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
       }
       return slide;
     }));
+  };
+
+  const handleTriggerEdit = (slideId: string, field: 'title' | 'content', value: string) => {
+    // Update the slide with the AI suggestion
+    const updatedSlides = slides.map(slide => {
+      if (slide.id === slideId) {
+        return {
+          ...slide,
+          [field]: value
+        };
+      }
+      return slide;
+    });
+    
+    setSlides(updatedSlides);
+    
+    // Set the active slide to the one being edited
+    setActiveSlideId(slideId);
+    
+    // Set the trigger state to activate edit mode for this field
+    setTriggerEditSlide({ slideId, fields: [field] });
+  };
+
+  const handleMultipleFieldUpdates = (slideId: string, updates: any) => {
+    // Update the slide with all AI suggestions
+    const updatedSlides = slides.map(slide => {
+      if (slide.id === slideId) {
+        return {
+          ...slide,
+          ...updates
+        };
+      }
+      return slide;
+    });
+    
+    setSlides(updatedSlides);
+    
+    // Set the active slide to the one being edited
+    setActiveSlideId(slideId);
+    
+    // Determine which fields were updated
+    const updatedFields: ('title' | 'content')[] = [];
+    if (updates.title) updatedFields.push('title');
+    if (updates.content) updatedFields.push('content');
+    
+    // Set the trigger state to activate edit mode for all updated fields
+    if (updatedFields.length > 0) {
+      setTriggerEditSlide({ slideId, fields: updatedFields });
+    }
+  };
+
+  const handleEditTriggered = () => {
+    // Clear the trigger state after edit mode is activated
+    setTriggerEditSlide(null);
   };
 
   const handleProjectUpdate = async (updatedProject: any) => {
@@ -338,6 +393,8 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
             showNoise={true}
             onProjectUpdate={handleProjectUpdate}
             editable={true}
+            triggerEditSlide={triggerEditSlide}
+            onEditTriggered={handleEditTriggered}
           />
         </div>
       ) : (
@@ -364,6 +421,8 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
                   showNoise={true}
                   onProjectUpdate={handleProjectUpdate}
                   editable={true}
+                  triggerEditSlide={triggerEditSlide}
+                  onEditTriggered={handleEditTriggered}
                 />
               </div>
             ) : (
@@ -382,6 +441,8 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
             activeSlide={activeSlide}
             onSendMessage={handleSendMessage}
             onSlideUpdate={handleSlideUpdateFromChat}
+            onTriggerEdit={handleTriggerEdit}
+            onMultipleFieldUpdate={handleMultipleFieldUpdates}
             isLoading={loading}
           />
         </div>

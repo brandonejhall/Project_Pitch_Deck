@@ -7,9 +7,19 @@ interface SlidesPageProps {
   showNoise?: boolean;
   onProjectUpdate?: (updatedProject: Project) => void;
   editable?: boolean;
+  triggerEditSlide?: { slideId: string; fields: ('title' | 'content')[] } | null;
+  onEditTriggered?: () => void;
 }
 
-export function SlidesPage({ projects, layout = 'two-column', showNoise, onProjectUpdate, editable }: SlidesPageProps) {
+export function SlidesPage({ 
+  projects, 
+  layout = 'two-column', 
+  showNoise, 
+  onProjectUpdate, 
+  editable,
+  triggerEditSlide,
+  onEditTriggered
+}: SlidesPageProps) {
   return (
     <div className="h-screen bg-gray-50 overflow-y-auto">
       <div className="py-8 sm:py-12 space-y-8 sm:space-y-12">
@@ -21,6 +31,9 @@ export function SlidesPage({ projects, layout = 'two-column', showNoise, onProje
             showNoise={showNoise}
             onProjectUpdate={onProjectUpdate}
             editable={editable}
+            triggerEditTitle={triggerEditSlide?.slideId === project.id && triggerEditSlide?.fields.includes('title')}
+            triggerEditBody={triggerEditSlide?.slideId === project.id && triggerEditSlide?.fields.includes('content')}
+            onEditTriggered={onEditTriggered}
           />
         ))}
       </div>

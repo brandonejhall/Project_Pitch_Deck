@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Mail, Phone, Linkedin, Edit3, Check, X } from 'lucide-react';
 import { generateGradientConfig, generateThemeTokens } from '../lib/gradient-utils';
 import { useResponsive } from '../hooks/use-responsive';
@@ -27,6 +27,9 @@ interface SlideCardProps {
   layout?: 'two-column' | 'single';
   onProjectUpdate?: (updatedProject: Project) => void;
   editable?: boolean;
+  triggerEditTitle?: boolean;
+  triggerEditBody?: boolean;
+  onEditTriggered?: () => void;
 }
 
 // Mesh gradient component with deterministic blobs
@@ -106,7 +109,10 @@ export function SlideCard({
   showNoise, 
   layout = 'two-column',
   onProjectUpdate,
-  editable = false
+  editable = false,
+  triggerEditTitle,
+  triggerEditBody,
+  onEditTriggered
 }: SlideCardProps) {
   const { isMobile } = useResponsive();
   
@@ -117,6 +123,27 @@ export function SlideCard({
   const [bodyValue, setBodyValue] = useState(project.body);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  // Update local state when project prop changes
+  useEffect(() => {
+    setTitleValue(project.title);
+    setBodyValue(project.body);
+  }, [project.title, project.body]);
+
+  // Handle trigger props for edit mode
+  useEffect(() => {
+    if (triggerEditTitle && !editingTitle) {
+      setEditingTitle(true);
+      onEditTriggered?.();
+    }
+  }, [triggerEditTitle, editingTitle, onEditTriggered]);
+
+  useEffect(() => {
+    if (triggerEditBody && !editingBody) {
+      setEditingBody(true);
+      onEditTriggered?.();
+    }
+  }, [triggerEditBody, editingBody, onEditTriggered]);
   
   // Generate deterministic gradient configuration
   const gradientConfig = useMemo(() => {

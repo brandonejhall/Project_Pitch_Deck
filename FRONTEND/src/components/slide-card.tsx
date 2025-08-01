@@ -12,9 +12,12 @@ interface SlideCardProps {
   slide: Slide;
   className?: string;
   onSlideUpdate?: (updatedSlide: Slide) => void;
+  triggerEditTitle?: boolean;
+  triggerEditContent?: boolean;
+  onEditTriggered?: () => void;
 }
 
-export function SlideCard({ slide, className = '', onSlideUpdate }: SlideCardProps) {
+export function SlideCard({ slide, className = '', onSlideUpdate, triggerEditTitle, triggerEditContent, onEditTriggered }: SlideCardProps) {
   const iconMapping = getSlideIcon(slide.icon);
   const IconComponent = iconMapping.icon;
   const { updateSlide, loading } = useApi();
@@ -31,6 +34,21 @@ export function SlideCard({ slide, className = '', onSlideUpdate }: SlideCardPro
     setTitleValue(slide.title);
     setContentValue(slide.content);
   }, [slide.title, slide.content]);
+
+  // Handle trigger props for edit mode
+  useEffect(() => {
+    if (triggerEditTitle && !editingTitle) {
+      setEditingTitle(true);
+      onEditTriggered?.();
+    }
+  }, [triggerEditTitle, editingTitle, onEditTriggered]);
+
+  useEffect(() => {
+    if (triggerEditContent && !editingContent) {
+      setEditingContent(true);
+      onEditTriggered?.();
+    }
+  }, [triggerEditContent, editingContent, onEditTriggered]);
 
   const handleTitleSave = async () => {
     if (titleValue.trim() !== slide.title) {

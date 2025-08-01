@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from '@/types/slide';
 import { Slide } from '@/types/slide';
 import { getSlideIcon } from '@/lib/slide-icons';
-import { Send, Bot, User, Check, X, RotateCcw } from 'lucide-react';
+import { Send, Bot, User, Check, X, RotateCcw, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,6 +14,8 @@ interface ChatSidebarEnhancedProps {
   activeSlide?: Slide;
   onSendMessage: (content: string, slideId?: string) => void;
   onSlideUpdate?: (slideId: string, updates: any) => void;
+  onTriggerEdit?: (slideId: string, field: 'title' | 'content', value: string) => void;
+  onMultipleFieldUpdate?: (slideId: string, updates: any) => void;
   isLoading?: boolean;
 }
 
@@ -28,6 +30,8 @@ export function ChatSidebarEnhanced({
   activeSlide, 
   onSendMessage, 
   onSlideUpdate,
+  onTriggerEdit,
+  onMultipleFieldUpdate,
   isLoading = false 
 }: ChatSidebarEnhancedProps) {
   const [input, setInput] = useState('');
@@ -79,15 +83,31 @@ export function ChatSidebarEnhanced({
             messageId: updateId
           }]);
 
-          // Auto-apply updates after a short delay
-          setTimeout(() => {
+          // Apply the updates immediately and trigger edit mode
+          if (onMultipleFieldUpdate) {
+            // Use the multiple field update function
+            onMultipleFieldUpdate(activeSlide.id, response.slideUpdates);
+          } else {
+            // Fallback to single field updates
             onSlideUpdate(activeSlide.id, response.slideUpdates);
-            setPendingUpdates(prev => prev.filter(u => u.messageId !== updateId));
-            toast({
-              title: "Slide Updated",
-              description: "AI suggestions have been applied to your slide.",
-            });
-          }, 2000);
+            
+            // Trigger edit mode for the updated fields
+            if (onTriggerEdit && response.slideUpdates) {
+              if (response.slideUpdates.title) {
+                onTriggerEdit(activeSlide.id, 'title', response.slideUpdates.title);
+              } else if (response.slideUpdates.content) {
+                onTriggerEdit(activeSlide.id, 'content', response.slideUpdates.content);
+              }
+            }
+          }
+          
+          // Remove the pending update since we applied it immediately
+          setPendingUpdates(prev => prev.filter(u => u.messageId !== updateId));
+          
+          toast({
+            title: "AI Suggestions Applied",
+            description: "The AI suggestions have been applied. You can now review and save the changes.",
+          });
         }
       } catch (error) {
         console.error('Chat request failed:', error);
@@ -100,6 +120,25 @@ export function ChatSidebarEnhanced({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleEditUpdate = (pendingUpdate: PendingUpdate) => {
+    if (onTriggerEdit && pendingUpdate.updates) {
+      // Trigger text editor for the first field that has changes
+      if (pendingUpdate.updates.title) {
+        onTriggerEdit(pendingUpdate.slideId, 'title', pendingUpdate.updates.title);
+      } else if (pendingUpdate.updates.content) {
+        onTriggerEdit(pendingUpdate.slideId, 'content', pendingUpdate.updates.content);
+      }
+      
+      // Remove the pending update after triggering edit
+      setPendingUpdates(prev => prev.filter(u => u.messageId !== pendingUpdate.messageId));
+      
+      toast({
+        title: "Edit Mode Activated",
+        description: "You can now review and save the AI suggestions.",
+      });
     }
   };
 
