@@ -22,6 +22,8 @@ export function ProjectEditor() {
   const { getProject, loading } = useApi();
   const [project, setProject] = useState<Project | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (projectId && user) {
@@ -31,10 +33,24 @@ export function ProjectEditor() {
 
   const loadProject = async () => {
     try {
+      setRetrying(false);
       const projectData = await getProject(parseInt(projectId!));
       setProject(projectData);
+      setRetryCount(0); // Reset retry count on success
     } catch (error) {
       console.error('Failed to load project:', error);
+      
+      // If it's a 404 or project not found, try again after a short delay (max 3 retries)
+      if ((error.message.includes('404') || error.message.includes('not found')) && retryCount < 3) {
+        console.log(`Project not found, retrying in 2 seconds... (attempt ${retryCount + 1}/3)`);
+        setRetrying(true);
+        setRetryCount(prev => prev + 1);
+        setTimeout(() => {
+          loadProject();
+        }, 2000);
+        return;
+      }
+      
       setError('Failed to load project');
       toast({
         title: "Failed to load project",
@@ -44,12 +60,17 @@ export function ProjectEditor() {
     }
   };
 
-  if (loading) {
+  if (loading || retrying) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading project...</p>
+          <p className="text-gray-600">
+            {retrying 
+              ? `Project not found, retrying... (attempt ${retryCount}/3)`
+              : 'Loading project...'
+            }
+          </p>
         </div>
       </div>
     );

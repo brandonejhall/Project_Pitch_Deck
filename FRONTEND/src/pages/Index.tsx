@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Sparkles, ArrowRight, Lightbulb, Presentation, MessageSquare, LogOut } from 'lucide-react';
 import { useApi } from '@/hooks/use-api';
 import { toast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
@@ -15,6 +15,7 @@ const Index = () => {
   const [generatedSlides, setGeneratedSlides] = useState<any[]>([]);
   const { generateSlides, loading, error } = useApi();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
     if (!idea.trim()) return;
@@ -28,8 +29,8 @@ const Index = () => {
           title: "Project Created!",
           description: `Generated ${response.slides.length} slides and saved as "${response.projectTitle}".`,
         });
-        // Redirect to the project editor
-        window.location.href = `/editor/${response.projectId}`;
+        // Use React Router navigation instead of window.location.href
+        navigate(`/editor/${response.projectId}`);
         return;
       }
       
