@@ -1,11 +1,11 @@
 import { Controller, Patch, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SlidesService, SlideUpdateDto } from './slides.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 
 @ApiTags('slides')
 @Controller('slides')
-// @UseGuards(JwtAuthGuard) // Commented out for testing
+@UseGuards(FirebaseAuthGuard) // Enable Firebase auth
 export class SlidesController {
   constructor(private slidesService: SlidesService) {}
 
@@ -18,8 +18,8 @@ export class SlidesController {
     @Request() req
   ) {
     const slideId = parseInt(id);
-    // Using dummy userId for testing since auth is disabled
-    const dummyUserId = 1;
-    return this.slidesService.updateSlide(dummyUserId, slideId, updateData);
+    // Use authenticated user from Firebase
+    const userId = req.user.id;
+    return this.slidesService.updateSlide(userId, slideId, updateData);
   }
 } 

@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AiService, GenerateResponse } from '../ai/ai.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { IsString, IsNotEmpty } from 'class-validator';
 
 export class GenerateRequestDto {
@@ -14,7 +14,7 @@ export class GenerateController {
   constructor(private aiService: AiService) {}
 
   @Post()
-  // @UseGuards(JwtAuthGuard) // Commented out for testing
+  @UseGuards(FirebaseAuthGuard) // Enable Firebase auth
   @ApiOperation({ summary: 'Generate pitch deck slides' })
   @ApiResponse({ status: 200, description: 'Slides generated successfully' })
   async generateSlides(@Body() body: GenerateRequestDto): Promise<GenerateResponse> {

@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AiService, ChatResponse } from '../ai/ai.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 
 export class ChatRequestDto {
   prompt: string;
@@ -20,7 +20,7 @@ const chatContext: Record<number, string> = {};
 
 @ApiTags('chat')
 @Controller('chat')
-// @UseGuards(JwtAuthGuard) // Commented out for testing
+@UseGuards(FirebaseAuthGuard) // Enable Firebase auth
 export class ChatController {
   constructor(private aiService: AiService) {}
 

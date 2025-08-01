@@ -1,5 +1,6 @@
 // API client for connecting frontend to backend
 const API_BASE_URL = 'http://localhost:3001';
+import { getIdToken } from './firebase';
 
 // Types for API requests and responses
 export interface LoginRequest {
@@ -116,11 +117,11 @@ class ApiClient {
       ...options.headers,
     };
 
-      // Add authorization header if token exists
-  // Commented out for testing - no auth required
-  // if (this.token) {
-  //   headers['Authorization'] = `Bearer ${this.token}`;
-  // }
+    // Add Firebase ID token to authorization header
+    const firebaseToken = await getIdToken();
+    if (firebaseToken) {
+      headers['Authorization'] = `Bearer ${firebaseToken}`;
+    }
 
     const config: RequestInit = {
       ...options,
@@ -169,10 +170,9 @@ class ApiClient {
   }
 
   // Check if user is authenticated
-  isAuthenticated(): boolean {
-    // Always return true for testing since auth is disabled
-    return true;
-    // return !!this.token;
+  async isAuthenticated(): Promise<boolean> {
+    const token = await getIdToken();
+    return !!token;
   }
 
   // Get current token
