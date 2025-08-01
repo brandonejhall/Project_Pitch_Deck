@@ -4,7 +4,8 @@
   "description": "NestJS backend for AI Pitch Deck application",
   "main": "dist/main.js",
   "scripts": {
-    "build": "npx @nestjs/cli build",
+    "build": "npm run prisma:generate && npx @nestjs/cli build",
+    "build:prod": "npm run prisma:generate && npm run prisma:migrate:deploy && npx @nestjs/cli build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "npx @nestjs/cli start",
     "start:dev": "npx @nestjs/cli start --watch",
@@ -19,7 +20,13 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:migrate:reset": "prisma migrate reset",
+    "prisma:studio": "prisma studio",
+    "db:setup": "npm run prisma:generate && npm run prisma:push",
+    "db:migrate": "npm run prisma:generate && npm run prisma:migrate",
+    "db:reset": "npm run prisma:migrate:reset",
+    "postinstall": "npm run prisma:generate"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
