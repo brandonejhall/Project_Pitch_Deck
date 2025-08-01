@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
-import { Mail, Phone, Linkedin } from 'lucide-react';
+import React, { useMemo, useState, useRef } from 'react';
+import { Mail, Phone, Linkedin, Edit3, Check, X } from 'lucide-react';
 import { generateGradientConfig, generateThemeTokens } from '../lib/gradient-utils';
 import { useResponsive } from '../hooks/use-responsive';
+import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
 
 export interface Contact {
   type: 'email' | 'phone' | 'linkedin';
@@ -23,6 +25,8 @@ interface SlideCardProps {
   forceSeed?: string;
   showNoise?: boolean;
   layout?: 'two-column' | 'single';
+  onProjectUpdate?: (updatedProject: Project) => void;
+  editable?: boolean;
 }
 
 // Mesh gradient component with deterministic blobs
@@ -100,9 +104,19 @@ export function SlideCard({
   forcePalette, 
   forceSeed, 
   showNoise, 
-  layout = 'two-column' 
+  layout = 'two-column',
+  onProjectUpdate,
+  editable = false
 }: SlideCardProps) {
   const { isMobile } = useResponsive();
+  
+  // Editing state
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingBody, setEditingBody] = useState(false);
+  const [titleValue, setTitleValue] = useState(project.title);
+  const [bodyValue, setBodyValue] = useState(project.body);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
   
   // Generate deterministic gradient configuration
   const gradientConfig = useMemo(() => {
@@ -116,6 +130,148 @@ export function SlideCard({
   );
   
   const noise = showNoise !== undefined ? showNoise : gradientConfig.noise;
+  
+  // Editing functions
+  const handleTitleSave = () => {
+    if (onProjectUpdate && titleValue.trim() !== project.title) {
+      onProjectUpdate({ ...project, title: titleValue.trim() });
+    }
+    setEditingTitle(false);
+  };
+
+  const handleBodySave = () => {
+    if (onProjectUpdate && bodyValue.trim() !== project.body) {
+      onProjectUpdate({ ...project, body: bodyValue.trim() });
+    }
+    setEditingBody(false);
+  };
+
+  const handleTitleCancel = () => {
+    setTitleValue(project.title);
+    setEditingTitle(false);
+  };
+
+  const handleBodyCancel = () => {
+    setBodyValue(project.body);
+    setEditingBody(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, type: 'title' | 'body') => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (type === 'title') handleTitleSave();
+      else handleBodySave();
+    } else if (e.key === 'Escape') {
+      if (type === 'title') handleTitleCancel();
+      else handleBodyCancel();
+    }
+  };
+
+  const renderEditableTitle = () => {
+    if (editingTitle && editable) {
+      return (
+        <div className="flex items-center gap-2">
+          <Textarea
+            ref={titleRef}
+            value={titleValue}
+            onChange={(e) => setTitleValue(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, 'title')}
+            onBlur={handleTitleSave}
+            className="font-semibold text-gray-900 leading-tight resize-none border-none bg-transparent focus:bg-gray-50 p-0"
+            style={{ 
+              fontSize: isMobile ? '2.25rem' : '2.75rem',
+              lineHeight: 1.1
+            }}
+            autoFocus
+          />
+          <div className="flex gap-1">
+            <Button size="sm" variant="ghost" onClick={handleTitleSave} className="h-6 w-6 p-0">
+              <Check className="w-3 h-3" />
+            </Button>
+            <Button size="sm" variant="ghost" onClick={handleTitleCancel} className="h-6 w-6 p-0">
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-2 group">
+        <h1 
+          className="font-semibold text-gray-900 leading-tight"
+          style={{ 
+            fontSize: isMobile ? '2.25rem' : '2.75rem',
+            lineHeight: 1.1
+          }}
+        >
+          {project.title}
+        </h1>
+        {editable && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setEditingTitle(true)}
+            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Edit3 className="w-3 h-3" />
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  const renderEditableBody = () => {
+    if (editingBody && editable) {
+      return (
+        <div className="space-y-2">
+          <Textarea
+            ref={bodyRef}
+            value={bodyValue}
+            onChange={(e) => setBodyValue(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, 'body')}
+            onBlur={handleBodySave}
+            className="text-gray-700 leading-relaxed resize-none border-none bg-transparent focus:bg-gray-50 p-0"
+            style={{ 
+              fontSize: isMobile ? '1rem' : '1.125rem',
+              lineHeight: 1.6
+            }}
+            autoFocus
+          />
+          <div className="flex gap-1">
+            <Button size="sm" variant="ghost" onClick={handleBodySave} className="h-6 w-6 p-0">
+              <Check className="w-3 h-3" />
+            </Button>
+            <Button size="sm" variant="ghost" onClick={handleBodyCancel} className="h-6 w-6 p-0">
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="group relative">
+        <p 
+          className="text-gray-700 leading-relaxed"
+          style={{ 
+            fontSize: isMobile ? '1rem' : '1.125rem',
+            lineHeight: 1.6
+          }}
+        >
+          {project.body}
+        </p>
+        {editable && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setEditingBody(true)}
+            className="absolute top-0 right-0 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Edit3 className="w-3 h-3" />
+          </Button>
+        )}
+      </div>
+    );
+  };
   
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8">
@@ -137,28 +293,12 @@ export function SlideCard({
             }`}>
               {/* Header */}
               <div className="mb-6">
-                <h1 
-                  className="font-semibold text-gray-900 leading-tight"
-                  style={{ 
-                    fontSize: isMobile ? '2.25rem' : '2.75rem', // 36px mobile, 44px desktop
-                    lineHeight: 1.1
-                  }}
-                >
-                  {project.title}
-                </h1>
+                {renderEditableTitle()}
               </div>
               
               {/* Body */}
               <div className="space-y-4">
-                <p 
-                  className="text-gray-700 leading-relaxed"
-                  style={{ 
-                    fontSize: isMobile ? '1rem' : '1.125rem', // 16px mobile, 18px desktop
-                    lineHeight: 1.6
-                  }}
-                >
-                  {project.body}
-                </p>
+                {renderEditableBody()}
               </div>
             </div>
             

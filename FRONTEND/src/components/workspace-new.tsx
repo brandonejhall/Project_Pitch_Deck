@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Slide, ChatMessage } from '@/types/slide';
 import { SlideList } from './slide-list';
 import { ChatSidebarEnhanced } from './chat-sidebar-enhanced';
@@ -97,7 +97,7 @@ function convertProjectToSlide(project: Project): Slide {
   };
 }
 
-export function WorkspaceNew({ initialSlides }: { initialSlides?: any[] }) {
+export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any[], projectId?: number }) {
   const [slides, setSlides] = useState<Slide[]>(initialSlides ? 
     initialSlides.map((slide, index) => ({
       id: slide.id || `slide-${index}`,
@@ -111,7 +111,46 @@ export function WorkspaceNew({ initialSlides }: { initialSlides?: any[] }) {
   const [activeSlideId, setActiveSlideId] = useState(slides[0]?.id || '');
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
   const [viewMode, setViewMode] = useState<'slides' | 'workspace'>('slides');
-  const { updateSlide, loading, error } = useApi();
+  const { updateSlide, loading, error, getProject } = useApi();
+
+  // Load project slides if projectId is provided
+  useEffect(() => {
+    if (projectId) {
+      loadProjectSlides();
+    }
+  }, [projectId]);
+
+  const loadProjectSlides = async () => {
+    try {
+      const project: any = await getProject(projectId);
+      
+      // Check if project has slides
+      if (project.slides && project.slides.length > 0) {
+        // Convert backend slides to frontend format
+        const loadedSlides: Slide[] = project.slides.map((slide: any) => ({
+          id: slide.id, // This should be an integer from the backend
+          position: slide.position,
+          title: slide.title,
+          content: slide.content,
+          layout: 'two-column', // Default layout
+          icon: 'default'
+        }));
+        
+        setSlides(loadedSlides);
+        setActiveSlideId(loadedSlides[0]?.id || '');
+      } else {
+        // No slides found, use mock slides
+        console.log('No slides found for project, using mock slides');
+      }
+    } catch (error) {
+      console.error('Failed to load project slides:', error);
+      toast({
+        title: "Failed to load project",
+        description: "Could not load project slides. Using default slides.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const activeSlide = slides.find(slide => slide.id === activeSlideId);
 
@@ -153,6 +192,47 @@ export function WorkspaceNew({ initialSlides }: { initialSlides?: any[] }) {
       }
       return slide;
     }));
+  };
+
+  const handleProjectUpdate = async (updatedProject: any) => {
+    // Convert project back to slide and update
+    const updatedSlide = convertProjectToSlide(updatedProject);
+    
+    // Update local state immediately for responsive UI
+    setSlides(slides.map(slide => 
+      slide.id === updatedSlide.id ? updatedSlide : slide
+    ));
+    
+    // Save to backend
+    try {
+      // Check if slide ID is a number (real slide) or string (mock data)
+      const slideId = typeof updatedSlide.id === 'string' ? 
+        parseInt(updatedSlide.id.replace('slide-', '')) : 
+        updatedSlide.id;
+      
+      await updateSlide(slideId, {
+        title: updatedSlide.title,
+        content: updatedSlide.content
+      });
+      
+      // Show success feedback
+      toast({
+        title: "Changes Saved",
+        description: "Your slide has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Failed to save slide update:', error);
+      
+      // Show error feedback
+      toast({
+        title: "Save Failed",
+        description: "Failed to save changes. Please try again.",
+        variant: "destructive",
+      });
+      
+      // Optionally revert local state on error
+      // setSlides(slides); // Revert to original state
+    }
   };
 
   const handleSlideReorder = (reorderedSlides: Slide[]) => {
@@ -247,7 +327,13 @@ export function WorkspaceNew({ initialSlides }: { initialSlides?: any[] }) {
       {viewMode === 'slides' ? (
         // Slides Page View
         <div className="flex-1 overflow-hidden">
-          <SlidesPage projects={projects} layout="two-column" showNoise={true} />
+          <SlidesPage 
+            projects={projects} 
+            layout="two-column" 
+            showNoise={true}
+            onProjectUpdate={handleProjectUpdate}
+            editable={true}
+          />
         </div>
       ) : (
         // Original Workspace View
@@ -270,7 +356,9 @@ export function WorkspaceNew({ initialSlides }: { initialSlides?: any[] }) {
                 <SlidesPage 
                   projects={[convertSlideToProject(activeSlide)]} 
                   layout="two-column" 
-                  showNoise={true} 
+                  showNoise={true}
+                  onProjectUpdate={handleProjectUpdate}
+                  editable={true}
                 />
               </div>
             ) : (

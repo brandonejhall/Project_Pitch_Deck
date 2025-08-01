@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { SlidesDemo } from "./pages/SlidesDemo";
 import { AiChatDemo } from "./components/ai-chat-demo";
+import { Projects } from "./pages/Projects";
+import { ProjectEditor } from "./pages/ProjectEditor";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -21,6 +23,8 @@ const App = () => (
         <BrowserRouter>
                   <Routes>
           <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+          <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+          <Route path="/editor/:projectId" element={<ProtectedRoute><ProjectEditor /></ProtectedRoute>} />
           <Route path="/slides-demo" element={<ProtectedRoute><SlidesDemo /></ProtectedRoute>} />
           <Route path="/ai-chat-demo" element={<ProtectedRoute><AiChatDemo /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

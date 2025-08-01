@@ -9,6 +9,8 @@ export interface Slide {
 
 export interface GenerateResponse {
   slides: Slide[];
+  projectId?: number;
+  projectTitle?: string;
 }
 
 export interface ChatResponse {

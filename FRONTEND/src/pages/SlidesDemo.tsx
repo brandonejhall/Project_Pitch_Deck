@@ -4,10 +4,13 @@ import { Project } from '../components/slide-card-new';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
 import { Label } from '../components/ui/label';
+import { LogOut, Sparkles } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function SlidesDemo() {
   const [showNoise, setShowNoise] = useState(true);
   const [layout, setLayout] = useState<'two-column' | 'single'>('two-column');
+  const { user, logout } = useAuth();
 
   const sampleProjects: Project[] = [
     {
@@ -76,6 +79,33 @@ export function SlidesDemo() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      {user && (
+        <nav className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Sparkles className="w-6 h-6 text-primary" />
+              <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user.email}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="interactive-hover text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </nav>
+      )}
+      
       {/* Controls */}
       <div className="bg-white border-b border-gray-200 p-4">
         <div className="max-w-7xl mx-auto">

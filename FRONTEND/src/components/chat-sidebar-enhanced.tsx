@@ -156,10 +156,7 @@ export function ChatSidebarEnhanced({
           {messages.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Bot className="w-8 h-8 mx-auto mb-3 text-gray-400" />
-              <p className="text-footer">Ask me to improve your slides!</p>
-              <p className="text-xs text-gray-400 mt-2">
-                Try: "Make this more persuasive" or "Add a hero image"
-              </p>
+              <p className="text-footer">Start a conversation to improve your slides</p>
             </div>
           ) : (
             messages.map((message) => (

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ChevronDown, Download, Settings, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDown, Download, Settings, Sparkles, LogOut, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,6 +9,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ProjectCreator } from './project-creator';
+import { useAuth } from '@/contexts/AuthContext';
+import { useApi } from '@/hooks/use-api';
+import { Link } from 'react-router-dom';
 
 interface MinimalNavBarProps {
   projectTitle: string;
@@ -17,24 +20,38 @@ interface MinimalNavBarProps {
 }
 
 export function MinimalNavBar({ projectTitle, onExport, onSettings }: MinimalNavBarProps) {
-  const [projects] = useState([
+  const { logout, user } = useAuth();
+  const { getProjects } = useApi();
+  const [projects, setProjects] = useState([
     { id: '1', title: projectTitle },
-    { id: '2', title: 'AI Healthcare Platform' },
-    { id: '3', title: 'Sustainable Energy Solution' },
   ]);
+
+  // Load user's projects
+  useEffect(() => {
+    if (user) {
+      const loadProjects = async () => {
+        try {
+          const userProjects = await getProjects();
+          if (userProjects && userProjects.length > 0) {
+            setProjects(userProjects.map(project => ({
+              id: project.id.toString(),
+              title: project.title
+            })));
+          }
+        } catch (error) {
+          console.error('Failed to load projects:', error);
+        }
+      };
+      
+      loadProjects();
+    }
+  }, [user, getProjects]);
 
   return (
     <nav className="glass-card border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
-        {/* Logo & Project Selector */}
+        {/* Project Selector */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-primary" />
-            <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
-          </div>
-          
-          <div className="h-6 w-px bg-gray-300" />
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2 font-medium">
@@ -82,6 +99,27 @@ export function MinimalNavBar({ projectTitle, onExport, onSettings }: MinimalNav
             className="interactive-hover"
           >
             <Settings className="w-4 h-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="interactive-hover"
+          >
+            <Link to="/projects">
+              <FolderOpen className="w-4 h-4 mr-2" />
+              Projects
+            </Link>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="interactive-hover text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <LogOut className="w-4 h-4" />
           </Button>
         </div>
       </div>

@@ -1,6 +1,6 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ProjectsService, ProjectCreateDto } from './projects.service';
+import { ProjectsService, ProjectCreateDto, ProjectUpdateDto } from './projects.service';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 
 @ApiTags('projects')
@@ -8,6 +8,15 @@ import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 @UseGuards(FirebaseAuthGuard) // Enable Firebase auth
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all projects for the authenticated user' })
+  @ApiResponse({ status: 200, description: 'Projects retrieved successfully' })
+  async getProjects(@Request() req) {
+    // Use authenticated user from Firebase
+    const userId = req.user.id;
+    return this.projectsService.getProjects(userId);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new project' })
@@ -26,5 +35,23 @@ export class ProjectsController {
     // Use authenticated user from Firebase
     const userId = req.user.id;
     return this.projectsService.getProject(userId, projectId);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a project' })
+  @ApiResponse({ status: 200, description: 'Project updated successfully' })
+  async updateProject(@Param('id') id: string, @Body() updateData: ProjectUpdateDto, @Request() req) {
+    const projectId = parseInt(id);
+    const userId = req.user.id;
+    return this.projectsService.updateProject(userId, projectId, updateData);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a project' })
+  @ApiResponse({ status: 200, description: 'Project deleted successfully' })
+  async deleteProject(@Param('id') id: string, @Request() req) {
+    const projectId = parseInt(id);
+    const userId = req.user.id;
+    return this.projectsService.deleteProject(userId, projectId);
   }
 } 

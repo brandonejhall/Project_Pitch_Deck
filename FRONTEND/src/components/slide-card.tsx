@@ -5,6 +5,8 @@ import { MeshGradient } from './mesh-gradient';
 import { Mail, Phone, Linkedin, Edit3, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useApi } from '@/hooks/use-api';
+import { toast } from '@/hooks/use-toast';
 
 interface SlideCardProps {
   slide: Slide;
@@ -15,6 +17,7 @@ interface SlideCardProps {
 export function SlideCard({ slide, className = '', onSlideUpdate }: SlideCardProps) {
   const iconMapping = getSlideIcon(slide.icon);
   const IconComponent = iconMapping.icon;
+  const { updateSlide, loading } = useApi();
   
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingContent, setEditingContent] = useState(false);
@@ -29,16 +32,48 @@ export function SlideCard({ slide, className = '', onSlideUpdate }: SlideCardPro
     setContentValue(slide.content);
   }, [slide.title, slide.content]);
 
-  const handleTitleSave = () => {
-    if (onSlideUpdate && titleValue.trim() !== slide.title) {
-      onSlideUpdate({ ...slide, title: titleValue.trim() });
+  const handleTitleSave = async () => {
+    if (titleValue.trim() !== slide.title) {
+      const updatedSlide = { ...slide, title: titleValue.trim() };
+      onSlideUpdate?.(updatedSlide);
+      
+      // Update via API
+      try {
+        await updateSlide(parseInt(slide.id), { title: titleValue.trim() });
+        toast({
+          title: "Title Updated",
+          description: "Slide title has been updated successfully.",
+        });
+      } catch (err) {
+        toast({
+          title: "Update Failed",
+          description: "Failed to update slide title. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
     setEditingTitle(false);
   };
 
-  const handleContentSave = () => {
-    if (onSlideUpdate && contentValue.trim() !== slide.content) {
-      onSlideUpdate({ ...slide, content: contentValue.trim() });
+  const handleContentSave = async () => {
+    if (contentValue.trim() !== slide.content) {
+      const updatedSlide = { ...slide, content: contentValue.trim() };
+      onSlideUpdate?.(updatedSlide);
+      
+      // Update via API
+      try {
+        await updateSlide(parseInt(slide.id), { content: contentValue.trim() });
+        toast({
+          title: "Content Updated",
+          description: "Slide content has been updated successfully.",
+        });
+      } catch (err) {
+        toast({
+          title: "Update Failed",
+          description: "Failed to update slide content. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
     setEditingContent(false);
   };

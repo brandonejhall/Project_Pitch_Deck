@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { ChatSidebarEnhanced } from './chat-sidebar-enhanced';
 import { Slide } from '@/types/slide';
 import { ChatMessage } from '@/types/slide';
+import { LogOut, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Sample slide for demo
 const demoSlide: Slide = {
@@ -35,6 +38,7 @@ const samplePrompts = [
 export function AiChatDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>(sampleMessages);
   const [slide, setSlide] = useState<Slide>(demoSlide);
+  const { user, logout } = useAuth();
 
   const handleSendMessage = (content: string, slideId?: string) => {
     const newMessage: ChatMessage = {
@@ -60,8 +64,35 @@ export function AiChatDemo() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Navigation Bar */}
+      {user && (
+        <nav className="absolute top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Sparkles className="w-6 h-6 text-primary" />
+              <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user.email}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="interactive-hover text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </nav>
+      )}
+      
       {/* Main Content */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8" style={{ marginTop: user ? '80px' : '0' }}>
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">

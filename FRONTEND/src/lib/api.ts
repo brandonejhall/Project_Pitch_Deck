@@ -41,25 +41,42 @@ export interface GenerateResponse {
     content: string;
     type: string;
   }>;
+  projectId?: number;
+  projectTitle?: string;
 }
 
 export interface ProjectCreateRequest {
-  name: string;
+  title: string;
   description?: string;
+}
+
+export interface ProjectUpdateRequest {
+  title?: string;
 }
 
 export interface Project {
   id: number;
-  name: string;
+  title: string;
   description?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProjectWithSlides extends Project {
+  slides: Slide[];
 }
 
 export interface SlideUpdateRequest {
   title?: string;
   content?: string;
   type?: string;
+}
+
+export interface SlideCreateRequest {
+  title: string;
+  content: string;
+  position: number;
+  projectId: number;
 }
 
 export interface ChatRequest {
@@ -200,11 +217,35 @@ class ApiClient {
     });
   }
 
-  async getProject(projectId: number): Promise<Project> {
-    return this.request<Project>(`/projects/${projectId}`);
+  async updateProject(projectId: number, updateData: ProjectUpdateRequest): Promise<Project> {
+    return this.request<Project>(`/projects/${projectId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData),
+    });
+  }
+
+  async deleteProject(projectId: number): Promise<void> {
+    return this.request<void>(`/projects/${projectId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getProjects(): Promise<Project[]> {
+    return this.request<Project[]>('/projects');
+  }
+
+  async getProject(projectId: number): Promise<ProjectWithSlides> {
+    return this.request<ProjectWithSlides>(`/projects/${projectId}`);
   }
 
   // Slide methods
+  async createSlide(slideData: SlideCreateRequest): Promise<Slide> {
+    return this.request<Slide>('/slides', {
+      method: 'POST',
+      body: JSON.stringify(slideData),
+    });
+  }
+
   async updateSlide(slideId: number, updateData: SlideUpdateRequest): Promise<Slide> {
     return this.request<Slide>(`/slides/${slideId}`, {
       method: 'PATCH',

@@ -1,15 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
-import { auth, onAuthStateChange } from '../lib/firebase';
+import { auth, onAuthStateChange, signOutUser } from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  logout: async () => {},
 });
 
 export const useAuth = () => {
@@ -37,9 +39,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  const logout = async () => {
+    try {
+      await signOutUser();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   const value = {
     user,
     loading,
+    logout,
   };
 
   return (

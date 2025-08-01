@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { apiClient, LoginRequest, GenerateRequest, ProjectCreateRequest, SlideUpdateRequest, ChatRequest, ChatResponse } from '@/lib/api';
+import { apiClient, LoginRequest, GenerateRequest, ProjectCreateRequest, ProjectUpdateRequest, SlideUpdateRequest, ChatRequest, ChatResponse } from '@/lib/api';
 
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
@@ -58,6 +58,21 @@ export const useApi = () => {
     }
   }, []);
 
+  const getProjects = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.getProjects();
+      return response;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to get projects';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const getProject = useCallback(async (projectId: number) => {
     setLoading(true);
     setError(null);
@@ -66,6 +81,50 @@ export const useApi = () => {
       return response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to get project';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createSlide = useCallback(async (slideData: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.createSlide(slideData);
+      return response;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Slide creation failed';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateProject = useCallback(async (projectId: number, updateData: ProjectUpdateRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.updateProject(projectId, updateData);
+      return response;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Project update failed';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteProject = useCallback(async (projectId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await apiClient.deleteProject(projectId);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Project deletion failed';
       setError(errorMessage);
       throw err;
     } finally {
@@ -129,7 +188,11 @@ export const useApi = () => {
     // API methods
     generateSlides,
     createProject,
+    updateProject,
+    deleteProject,
+    getProjects,
     getProject,
+    createSlide,
     updateSlide,
     chatRequest,
     healthCheck,

@@ -5,18 +5,22 @@ interface SlidesPageProps {
   projects: Project[];
   layout?: 'two-column' | 'single';
   showNoise?: boolean;
+  onProjectUpdate?: (updatedProject: Project) => void;
+  editable?: boolean;
 }
 
-export function SlidesPage({ projects, layout = 'two-column', showNoise }: SlidesPageProps) {
+export function SlidesPage({ projects, layout = 'two-column', showNoise, onProjectUpdate, editable }: SlidesPageProps) {
   return (
-    <div className="min-h-screen bg-gray-50 py-8 sm:py-12">
-      <div className="space-y-8 sm:space-y-12">
+    <div className="h-screen bg-gray-50 overflow-y-auto">
+      <div className="py-8 sm:py-12 space-y-8 sm:space-y-12">
         {projects.map((project, index) => (
           <SlideCard
             key={project.id}
             project={project}
             layout={layout}
             showNoise={showNoise}
+            onProjectUpdate={onProjectUpdate}
+            editable={editable}
           />
         ))}
       </div>

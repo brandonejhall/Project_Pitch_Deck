@@ -1,6 +1,6 @@
-import { Controller, Patch, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Patch, Post, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SlidesService, SlideUpdateDto } from './slides.service';
+import { SlidesService, SlideUpdateDto, SlideCreateDto } from './slides.service';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 
 @ApiTags('slides')
@@ -8,6 +8,18 @@ import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 @UseGuards(FirebaseAuthGuard) // Enable Firebase auth
 export class SlidesController {
   constructor(private slidesService: SlidesService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new slide' })
+  @ApiResponse({ status: 201, description: 'Slide created successfully' })
+  async createSlide(
+    @Body() slideData: SlideCreateDto,
+    @Request() req
+  ) {
+    // Use authenticated user from Firebase
+    const userId = req.user.id;
+    return this.slidesService.createSlide(userId, slideData);
+  }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a slide' })

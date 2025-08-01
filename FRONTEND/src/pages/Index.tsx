@@ -3,22 +3,37 @@ import { WorkspaceNew } from '@/components/workspace-new';
 import { MeshGradient } from '@/components/mesh-gradient';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, ArrowRight, Lightbulb, Presentation, MessageSquare } from 'lucide-react';
+import { Sparkles, ArrowRight, Lightbulb, Presentation, MessageSquare, LogOut } from 'lucide-react';
 import { useApi } from '@/hooks/use-api';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [mode, setMode] = useState<'input' | 'workspace'>('input');
   const [idea, setIdea] = useState('');
   const [generatedSlides, setGeneratedSlides] = useState<any[]>([]);
   const { generateSlides, loading, error } = useApi();
+  const { user, logout } = useAuth();
 
   const handleGenerate = async () => {
     if (!idea.trim()) return;
     
     try {
       const response = await generateSlides(idea);
+      
+      // If a project was created, redirect to the project editor
+      if (response.projectId) {
+        toast({
+          title: "Project Created!",
+          description: `Generated ${response.slides.length} slides and saved as "${response.projectTitle}".`,
+        });
+        // Redirect to the project editor
+        window.location.href = `/editor/${response.projectId}`;
+        return;
+      }
+      
+      // Fallback to workspace mode if no project was created
       setGeneratedSlides(response.slides);
       setMode('workspace');
       toast({
@@ -46,6 +61,33 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      {user && (
+        <nav className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Sparkles className="w-6 h-6 text-primary" />
+              <span className="text-section font-semibold text-gray-900">PitchDeck AI</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user.email}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                className="interactive-hover text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </nav>
+      )}
+      
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           {/* Hero section */}
@@ -61,6 +103,13 @@ const Index = () => {
             
             {/* Demo links */}
             <div className="flex items-center justify-center gap-4">
+              <Link
+                to="/projects"
+                className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+                My Projects
+              </Link>
               <Link
                 to="/slides-demo"
                 className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
