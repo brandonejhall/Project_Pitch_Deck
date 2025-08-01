@@ -93,3 +93,8 @@ jspm_packages/
 # Temporary files
 tmp/
 temp/ 
+
+# Firebase keys
+*.key.json
+firebase-*.json
+**/ai-pitch-deck-*.json

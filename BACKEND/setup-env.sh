@@ -9,7 +9,6 @@ if [ ! -f .env ]; then
     cat > .env << EOF
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ai_pitch_deck"
 OPENAI_API_KEY="your-openai-api-key-here"
-JWT_SECRET="your-secret-key-change-in-production"
 EOF
     echo "✅ .env file created!"
 else

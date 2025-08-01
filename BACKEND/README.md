@@ -14,7 +14,6 @@ Create a `.env` file in the BACKEND directory:
 ```bash
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ai_pitch_deck"
 OPENAI_API_KEY="your-openai-api-key-here"
-JWT_SECRET="your-secret-key-change-in-production"
 ```
 
 ### 3. Set Up the Database
@@ -62,11 +61,10 @@ src/
 ├── main.ts                 # Application entry point
 ├── app.module.ts           # Root module
 ├── auth/                   # Authentication module
-│   ├── auth.module.ts
-│   ├── auth.service.ts
-│   ├── auth.controller.ts
-│   ├── jwt.strategy.ts
-│   └── jwt-auth.guard.ts
+│   └── auth.module.ts
+├── firebase/               # Firebase authentication
+│   ├── firebase.module.ts
+│   └── firebase.service.ts
 ├── ai/                     # AI service
 │   └── ai.service.ts
 ├── generate/               # Generate module
@@ -91,71 +89,22 @@ src/
 ## 🔌 API Endpoints
 
 ### Authentication
-- `POST /auth/login` - Login (returns JWT token)
-- `POST /auth/verify` - Verify JWT token
+- All endpoints use Firebase Authentication
+- Include Firebase ID token in Authorization header: `Bearer <token>`
 
 ### Generate
 - `POST /generate` - Generate pitch deck slides
 
 ### Projects
+- `GET /projects` - Get all projects for authenticated user
 - `POST /projects` - Create a new project
 - `GET /projects/:id` - Get a specific project
+- `PUT /projects/:id` - Update a project
+- `DELETE /projects/:id` - Delete a project
 
 ### Slides
+- `POST /slides` - Create a new slide
 - `PATCH /slides/:id` - Update a slide
 
 ### Chat
-- `POST /chat` - Get slide editing suggestions
-
-## 🔐 Authentication
-
-The API uses JWT authentication. Include the token in the Authorization header:
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-For development, you can use the dummy user by calling `/auth/login` with any credentials.
-
-## 🗄️ Database
-
-The application uses PostgreSQL with Prisma ORM. The schema includes:
-- Users
-- Projects (one per user)
-- Slides (belonging to projects)
-
-## 🤖 AI Integration
-
-The backend integrates with OpenAI for:
-- Pitch deck generation
-- Slide editing suggestions
-
-## 🛠️ Development
-
-### Adding New Modules
-```bash
-npx @nestjs/cli generate module <module-name>
-npx @nestjs/cli generate controller <controller-name>
-npx @nestjs/cli generate service <service-name>
-```
-
-### Database Changes
-```bash
-# After modifying schema.prisma
-npx prisma generate
-npx prisma db push
-```
-
-## 🚀 Deployment
-
-### Production Build
-```bash
-npm run build
-npm run start:prod
-```
-
-### Environment Variables
-Make sure to set all required environment variables in production:
-- `DATABASE_URL`
-- `OPENAI_API_KEY`
-- `JWT_SECRET`
-- `PORT` (optional, defaults to 3001) 
+- `POST /chat` - Get slide editing suggestions 
