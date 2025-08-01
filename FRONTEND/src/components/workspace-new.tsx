@@ -122,10 +122,13 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
 
   const loadProjectSlides = async () => {
     try {
+      console.log('🔍 Loading project slides for projectId:', projectId);
       const project: any = await getProject(projectId);
+      console.log('📋 Project data:', project);
       
       // Check if project has slides
       if (project.slides && project.slides.length > 0) {
+        console.log(`✅ Found ${project.slides.length} slides in project`);
         // Convert backend slides to frontend format
         const loadedSlides: Slide[] = project.slides.map((slide: any) => ({
           id: slide.id, // This should be an integer from the backend
@@ -136,14 +139,16 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
           icon: 'default'
         }));
         
+        console.log('🔄 Converted slides:', loadedSlides);
         setSlides(loadedSlides);
         setActiveSlideId(loadedSlides[0]?.id || '');
       } else {
         // No slides found, use mock slides
-        console.log('No slides found for project, using mock slides');
+        console.log('❌ No slides found for project, using mock slides');
+        console.log('📋 Project slides array:', project.slides);
       }
     } catch (error) {
-      console.error('Failed to load project slides:', error);
+      console.error('❌ Failed to load project slides:', error);
       toast({
         title: "Failed to load project",
         description: "Could not load project slides. Using default slides.",

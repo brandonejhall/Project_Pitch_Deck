@@ -1,8 +1,9 @@
-import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Request, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AiService, GenerateResponse } from '../ai/ai.service';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { ProjectsService } from '../projects/projects.service';
+import { SlidesService } from '../slides/slides.service';
 import { IsString, IsNotEmpty } from 'class-validator';
 
 export class GenerateRequestDto {
@@ -14,7 +15,8 @@ export class GenerateRequestDto {
 export class GenerateController {
   constructor(
     private aiService: AiService,
-    private projectsService: ProjectsService
+    private projectsService: ProjectsService,
+    private slidesService: SlidesService
   ) {}
 
   @Post()
@@ -44,13 +46,42 @@ export class GenerateController {
       
       console.log(`Created project with ID: ${project.id}`);
       
+      // Save generated slides to the database
+      console.log('Saving generated slides to database...');
+      const savedSlides = [];
+      for (let i = 0; i < slides.length; i++) {
+        const slide = slides[i];
+        console.log(`Processing slide ${i + 1}/${slides.length}:`, {
+          title: slide.title,
+          contentLength: slide.content.length,
+          position: i + 1,
+          projectId: project.id
+        });
+        
+        const savedSlide = await this.slidesService.createSlide(userId, {
+          title: slide.title,
+          content: slide.content,
+          position: i + 1, // Position starts at 1
+          projectId: project.id
+        });
+        savedSlides.push(savedSlide);
+        console.log(`✅ Saved slide ${i + 1}/${slides.length}: ${slide.title} (ID: ${savedSlide.id})`);
+      }
+      
+      console.log(`Successfully saved ${savedSlides.length} slides to database`);
+      
+      // Verify the slides were saved by fetching the project
+      console.log('Verifying saved slides...');
+      const verifyProject = await this.projectsService.getProject(userId, project.id);
+      console.log(`Verified project has ${verifyProject.slides?.length || 0} slides`);
+      
       return { 
         slides,
         projectId: project.id,
         projectTitle: project.title
       };
     } catch (error) {
-      console.error('Failed to create project:', error);
+      console.error('Failed to create project or save slides:', error);
       // Return slides even if project creation fails
       return { slides };
     }
@@ -104,5 +135,30 @@ export class GenerateController {
         firebaseUid: req.user.firebaseUid
       }
     };
+  }
+
+  @Get('test-slides/:projectId')
+  @UseGuards(FirebaseAuthGuard)
+  @ApiOperation({ summary: 'Test endpoint to check project slides' })
+  async testProjectSlides(@Param('projectId') projectId: string, @Request() req) {
+    const userId = req.user.id;
+    const projectIdNum = parseInt(projectId);
+    
+    try {
+      const project = await this.projectsService.getProject(userId, projectIdNum);
+      return {
+        projectId: project.id,
+        projectTitle: project.title,
+        slidesCount: project.slides?.length || 0,
+        slides: project.slides || []
+      };
+    } catch (error) {
+      return {
+        error: error.message,
+        projectId: projectIdNum,
+        slidesCount: 0,
+        slides: []
+      };
+    }
   }
 } 
