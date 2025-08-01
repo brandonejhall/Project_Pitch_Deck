@@ -112,6 +112,7 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
   const [viewMode, setViewMode] = useState<'slides' | 'workspace'>('slides');
   const [triggerEditSlide, setTriggerEditSlide] = useState<{ slideId: string; fields: ('title' | 'content')[] } | null>(null);
+  const [projectTitle, setProjectTitle] = useState('Untitled Project');
   const { updateSlide, loading, error, getProject } = useApi();
 
   // Load project slides if projectId is provided
@@ -126,6 +127,11 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
       console.log('🔍 Loading project slides for projectId:', projectId);
       const project: any = await getProject(projectId);
       console.log('📋 Project data:', project);
+      
+      // Set the project title
+      if (project.title) {
+        setProjectTitle(project.title);
+      }
       
       // Check if project has slides
       if (project.slides && project.slides.length > 0) {
@@ -330,9 +336,85 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
     }, 1500);
   };
 
-  const handleExport = () => {
-    console.log('Exporting presentation...');
-    // TODO: Implement export functionality
+  const handleExport = async () => {
+    try {
+      // Create a new window for PDF generation
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast({
+          title: "Export Failed",
+          description: "Please allow popups to export your presentation.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Generate HTML content for each slide
+      const slideHTML = slides.map((slide, index) => `
+        <div style="page-break-after: always; padding: 40px; font-family: Arial, sans-serif;">
+          <div style="margin-bottom: 30px;">
+            <h1 style="font-size: 32px; color: #1f2937; margin: 0; font-weight: 600;">
+              ${slide.title}
+            </h1>
+          </div>
+          <div style="font-size: 18px; line-height: 1.6; color: #374151;">
+            ${slide.content}
+          </div>
+          ${index < slides.length - 1 ? '<div style="page-break-after: always;"></div>' : ''}
+        </div>
+      `).join('');
+
+      // Create the complete HTML document
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${projectTitle}</title>
+          <style>
+            @media print {
+              body { margin: 0; }
+              div { page-break-inside: avoid; }
+            }
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 0; 
+            }
+          </style>
+        </head>
+        <body>
+          <div style="padding: 20px;">
+            <h1 style="text-align: center; color: #1f2937; margin-bottom: 40px; font-size: 24px;">
+              ${projectTitle}
+            </h1>
+            ${slideHTML}
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Write the HTML to the new window
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+
+      // Wait for content to load, then print
+      printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+      };
+
+      toast({
+        title: "Export Started",
+        description: "Your presentation is being prepared for export.",
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export presentation. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSettings = () => {
@@ -347,7 +429,7 @@ export function WorkspaceNew({ initialSlides, projectId }: { initialSlides?: any
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <MinimalNavBar
-        projectTitle="AI Customer Service Platform"
+        projectTitle={projectTitle}
         onExport={handleExport}
         onSettings={handleSettings}
       />

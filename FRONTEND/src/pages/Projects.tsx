@@ -26,6 +26,22 @@ export function Projects() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editTitle, setEditTitle] = useState('');
 
+  // Generate a default project name
+  const generateDefaultName = () => {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+    const timeStr = now.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
+    return `Pitch Deck - ${dateStr} at ${timeStr}`;
+  };
+
   // Load user's projects
   useEffect(() => {
     if (user) {
@@ -168,7 +184,10 @@ export function Projects() {
             </div>
             
             <Button
-              onClick={() => setShowCreateForm(true)}
+              onClick={() => {
+                setShowCreateForm(true);
+                setNewProjectTitle(generateDefaultName());
+              }}
               className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
             >
               <Plus className="w-4 h-4 mr-2" />

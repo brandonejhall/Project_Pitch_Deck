@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, Download, Settings, Sparkles, LogOut, FolderOpen } from 'lucide-react';
+import { ChevronDown, Download, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -92,14 +92,15 @@ export function MinimalNavBar({ projectTitle, onExport, onSettings }: MinimalNav
             Export
           </Button>
           
-          <Button
+          {/* Settings button hidden for now */}
+          {/* <Button
             variant="ghost"
             size="sm"
             onClick={onSettings}
             className="interactive-hover"
           >
             <Settings className="w-4 h-4" />
-          </Button>
+          </Button> */}
 
           <Button
             variant="ghost"
@@ -113,14 +114,7 @@ export function MinimalNavBar({ projectTitle, onExport, onSettings }: MinimalNav
             </Link>
           </Button>
           
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={logout}
-            className="interactive-hover text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
+          {/* Logout button removed - already available in main nav */}
         </div>
       </div>
     </nav>

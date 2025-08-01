@@ -14,6 +14,27 @@ export const ProjectCreator = () => {
   const [projectDescription, setProjectDescription] = useState('');
   const { createProject, loading } = useApi();
 
+  // Generate a default project name when dialog opens
+  const generateDefaultName = () => {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+    const timeStr = now.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
+    return `Pitch Deck - ${dateStr} at ${timeStr}`;
+  };
+
+  const handleOpenDialog = () => {
+    setProjectName(generateDefaultName());
+    setIsOpen(true);
+  };
+
   const handleCreateProject = async () => {
     if (!projectName.trim()) {
       toast({
@@ -26,13 +47,13 @@ export const ProjectCreator = () => {
 
     try {
       const project = await createProject({
-        name: projectName.trim(),
+        title: projectName.trim(),
         description: projectDescription.trim() || undefined,
       });
 
       toast({
         title: "Project Created",
-        description: `Project "${project.name}" has been created successfully.`,
+        description: `Project "${project.title}" has been created successfully.`,
       });
 
       // Reset form and close dialog
@@ -57,7 +78,7 @@ export const ProjectCreator = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="interactive-hover">
+        <Button variant="outline" className="interactive-hover" onClick={handleOpenDialog}>
           <Plus className="w-4 h-4 mr-2" />
           New Project
         </Button>

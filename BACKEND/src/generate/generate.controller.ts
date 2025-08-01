@@ -38,7 +38,21 @@ export class GenerateController {
     
     // Create project with generated slides
     try {
-      const projectTitle = `Pitch Deck - ${new Date().toLocaleDateString()}`;
+      // Generate a unique project title with timestamp
+      const now = new Date();
+      const timestamp = now.getTime();
+      const dateStr = now.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+      const timeStr = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+      
+      const projectTitle = `Pitch Deck - ${dateStr} at ${timeStr}`;
       const project = await this.projectsService.createProject(userId, {
         title: projectTitle,
         description: `Generated from prompt: ${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}`
