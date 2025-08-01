@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import * as path from 'path';
 
 export interface FirebaseUser {
   uid: string;
@@ -13,13 +12,27 @@ export class FirebaseService implements OnModuleInit {
   private app: admin.app.App;
 
   onModuleInit() {
-    // Initialize Firebase Admin SDK with service account file
+    // Initialize Firebase Admin SDK with base64 encoded service account
     if (!admin.apps.length) {
-      const serviceAccountPath = path.join(__dirname, '../../ai-pitch-deck-a5bc6-firebase-adminsdk-fbsvc-aa1f978ae2.json');
+      const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
       
-      this.app = admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountPath),
-      });
+      if (!serviceAccountBase64) {
+        throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 environment variable is required');
+      }
+
+      try {
+        // Decode base64 to string
+        const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('utf-8');
+        
+        // Parse the JSON service account
+        const serviceAccount = JSON.parse(serviceAccountJson);
+        
+        this.app = admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount),
+        });
+      } catch (error) {
+        throw new Error(`Failed to initialize Firebase Admin SDK: ${error.message}`);
+      }
     } else {
       this.app = admin.app();
     }
