@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Eye, Trash2, Calendar, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 interface Project {
@@ -19,6 +19,7 @@ interface Project {
 export function Projects() {
   const { user } = useAuth();
   const { getProjects, createProject, updateProject, deleteProject, loading } = useApi();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState('');
@@ -176,7 +177,10 @@ export function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Sparkles className="w-8 h-8 text-primary" />
+              <Sparkles 
+                className="w-8 h-8 text-primary cursor-pointer hover:text-primary/80 hover:scale-110 transition-all duration-200" 
+                onClick={() => navigate('/')} 
+              />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">My Projects</h1>
                 <p className="text-gray-600">Manage your pitch deck projects</p>
