@@ -4,8 +4,8 @@
   "description": "NestJS backend for AI Pitch Deck application",
   "main": "dist/main.js",
   "scripts": {
-    "build": "npx prisma generate && npx @nestjs/cli build",
-    "build:prod": "npx prisma generate && npx prisma migrate deploy && npx @nestjs/cli build",
+    "build": "npx prisma generate && npx prisma db push && npx @nestjs/cli build",
+    "build:prod": "npx prisma generate && npx prisma db push && npx @nestjs/cli build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "npx @nestjs/cli start",
     "start:dev": "npx @nestjs/cli start --watch",
