@@ -1,387 +1,406 @@
-# PitchDeck AI
+# Project Pitch Deck
 
-Transform your business idea into a professional pitch deck in minutes. Our AI creates compelling slides tailored to your vision.
+A modern web application for creating beautiful pitch deck slides with AI-powered design. Built with React, TypeScript, and Firebase, featuring real-time collaboration and stunning gradient designs.
 
-## 🚀 Features
+![Project Pitch Deck](https://img.shields.io/badge/React-18.3.1-blue?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue?style=flat-square&logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-4.5.2-purple?style=flat-square&logo=vite)
+![Firebase](https://img.shields.io/badge/Firebase-12.0.0-orange?style=flat-square&logo=firebase)
 
-- **AI-Powered Generation**: Create pitch decks from natural language descriptions
-- **Interactive Editing**: Real-time slide editing with AI assistance
-- **Smart Reordering**: Drag-and-drop slide reordering with save/cancel controls
-- **PDF Export**: Export presentations as PDF with one slide per page
-- **Firebase Authentication**: Secure user authentication and data persistence
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+## ✨ Features
 
-## 🏗️ Architecture
+- **AI-Powered Slide Generation**: Create professional pitch decks using OpenAI's GPT-4
+- **Real-time Collaboration**: Work together with team members in real-time
+- **Beautiful UI/UX**: Modern design with gradient backgrounds and smooth animations
+- **Drag & Drop Interface**: Intuitive slide reordering with drag and drop
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Firebase Authentication**: Secure user authentication and data storage
+- **Project Management**: Organize multiple pitch deck projects
+- **Export & Sharing**: Easy sharing and export capabilities
 
-### Frontend (React + TypeScript)
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **Shadcn UI** components
-- **React Router** for navigation
-- **Firebase Auth** for authentication
+## 🚀 Quick Start
 
-### Backend (NestJS + TypeScript)
-- **NestJS** framework
-- **Prisma ORM** for database management
-- **Firebase Admin SDK** for authentication
-- **OpenAI API** for AI-powered content generation
-- **PostgreSQL** database (via Prisma)
+### Prerequisites
 
-## 📋 Prerequisites
+- Node.js 18+ and npm
+- Firebase project setup
+- OpenAI API key (optional, for AI features)
 
-- Node.js 18+ 
-- npm or yarn
-- PostgreSQL database
-- Firebase project
-- OpenAI API key
+### Installation
 
-## 🛠️ Setup Instructions
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd Project_Pitch_Deck
+   ```
 
-### 1. Clone the Repository
+2. **Install dependencies**
+   ```bash
+   # Frontend
+   cd FRONTEND
+   npm install --legacy-peer-deps
+   
+   # Backend
+   cd ../BACKEND
+   npm install
+   ```
 
-```bash
-git clone <repository-url>
-cd Project_Pitch_Deck
+3. **Environment Setup**
+   
+   Create `.env` files in both frontend and backend directories:
+   
+   **FRONTEND/.env**
+   ```env
+   VITE_API_URL=http://localhost:3001
+   VITE_FIREBASE_API_KEY=your_firebase_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+   **BACKEND/.env**
+   ```env
+   PORT=3001
+   OPENAI_API_KEY=your_openai_api_key
+   FIREBASE_SERVICE_ACCOUNT_BASE64=your_base64_encoded_service_account
+   CORS_ORIGINS=http://localhost:8080,http://localhost:3000
+   DATABASE_URL=your_database_url
+   ```
+
+4. **Database Setup**
+   ```bash
+   cd BACKEND
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. **Start the application**
+   ```bash
+   # Start backend (in BACKEND directory)
+   npm run start:dev
+   
+   # Start frontend (in FRONTEND directory)
+   npm run dev
+   ```
+
+The application will be available at:
+- **Frontend**: http://localhost:8080
+- **Backend API**: http://localhost:3001
+- **API Documentation**: http://localhost:3001/api
+
+## 🏗️ Project Structure
+
+```
+Project_Pitch_Deck/
+├── FRONTEND/                 # React frontend application
+│   ├── src/
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── contexts/       # React contexts
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── lib/            # Utility libraries
+│   │   └── types/          # TypeScript type definitions
+│   ├── public/             # Static assets
+│   └── package.json
+├── BACKEND/                 # NestJS backend API
+│   ├── src/
+│   │   ├── ai/            # AI service for slide generation
+│   │   ├── auth/          # Authentication modules
+│   │   ├── firebase/      # Firebase integration
+│   │   ├── generate/      # Slide generation endpoints
+│   │   ├── projects/      # Project management
+│   │   ├── slides/        # Slide management
+│   │   └── prisma/        # Database service
+│   └── package.json
+└── README.md
 ```
 
-### 2. Backend Setup
+## 🎯 Usage Guide
 
-```bash
-cd BACKEND
+### Creating Your First Pitch Deck
 
-# Install dependencies
-npm install
+1. **Sign In**: Use your Google account to authenticate
+2. **Generate Slides**: Click "Create New Project" and enter your business idea
+3. **AI Generation**: The AI will create a complete pitch deck with multiple slides
+4. **Customize**: Edit slides, reorder them, and add your own content
+5. **Save & Share**: Your project is automatically saved and can be shared
 
-# Set up environment variables
-cp .env.example .env
-```
+### Working with Slides
 
-Edit `.env` with your configuration:
+#### **Slide Types Available**
+- **Hero Slide**: Introduction and value proposition
+- **Problem Slide**: Market problem identification
+- **Solution Slide**: Your product/service solution
+- **Market Slide**: Target market analysis
+- **Business Model**: Revenue streams and pricing
+- **Competition**: Competitive landscape
+- **Team Slide**: Key team members
+- **Financials**: Revenue projections and metrics
+- **Call to Action**: Next steps and contact information
 
-```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/pitchdeck_db"
+#### **Slide Customization**
+- **Edit Content**: Click on any slide to edit text and content
+- **Drag & Drop**: Reorder slides by dragging them
+- **Add Images**: Upload hero images for slides
+- **Change Layouts**: Switch between different slide layouts
+- **Real-time Updates**: Changes are saved automatically
 
-# Firebase
-FIREBASE_SERVICE_ACCOUNT_BASE64="base64_encoded_service_account_json"
+### Project Management
 
-# OpenAI
-OPENAI_API_KEY="your_openai_api_key"
+#### **Creating Projects**
+- Click "Create New Project" from the dashboard
+- Enter a business idea or concept
+- AI generates a complete pitch deck
+- Projects are automatically saved to your account
 
-# Environment
-NODE_ENV="development"
-```
+#### **Managing Projects**
+- View all your projects on the dashboard
+- Edit existing projects anytime
+- Duplicate projects for variations
+- Delete projects you no longer need
 
-### 3. Database Setup
+#### **Collaboration**
+- Share project links with team members
+- Real-time updates across all users
+- Comment and feedback system
+- Version history tracking
 
-```bash
-# Generate Prisma client
-npx prisma generate
+## 🔧 Configuration
 
-# Push schema to database
-npx prisma db push
+### Environment Variables
 
-# (Optional) Run migrations
-npx prisma migrate dev
-```
+#### **Frontend (.env)**
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_API_URL` | Backend API URL | Yes |
+| `VITE_FIREBASE_API_KEY` | Firebase API key | Yes |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase auth domain | Yes |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID | Yes |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket | Yes |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase sender ID | Yes |
+| `VITE_FIREBASE_APP_ID` | Firebase app ID | Yes |
 
-### 4. Frontend Setup
+#### **Backend (.env)**
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `PORT` | Server port (default: 3001) | No |
+| `OPENAI_API_KEY` | OpenAI API key for AI features | Yes |
+| `FIREBASE_SERVICE_ACCOUNT_BASE64` | Base64 encoded Firebase service account | Yes |
+| `CORS_ORIGINS` | Allowed CORS origins | Yes |
+| `DATABASE_URL` | Database connection string | Yes |
 
-```bash
-cd ../FRONTEND
+### Firebase Setup
 
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
-
-```env
-# API URL
-VITE_API_URL="http://localhost:3000"
-
-# Firebase Config
-VITE_FIREBASE_API_KEY="your_firebase_api_key"
-VITE_FIREBASE_AUTH_DOMAIN="your_project.firebaseapp.com"
-VITE_FIREBASE_PROJECT_ID="your_project_id"
-VITE_FIREBASE_STORAGE_BUCKET="your_project.appspot.com"
-VITE_FIREBASE_MESSAGING_SENDER_ID="your_sender_id"
-VITE_FIREBASE_APP_ID="your_app_id"
-```
-
-### 5. Firebase Configuration
-
-1. **Create Firebase Project**:
+1. **Create Firebase Project**
    - Go to [Firebase Console](https://console.firebase.google.com/)
    - Create a new project
-   - Enable Authentication with Email/Password
+   - Enable Authentication (Google provider)
+   - Create a web app
 
-2. **Get Service Account**:
+2. **Get Service Account**
    - Go to Project Settings > Service Accounts
    - Generate new private key
-   - Convert to base64: `base64 -i serviceAccountKey.json`
+   - Base64 encode the JSON file:
+     ```bash
+     base64 -i serviceAccountKey.json
+     ```
 
-3. **Configure Authentication**:
+3. **Configure Authentication**
+   - Enable Google sign-in method
    - Add your domain to authorized domains
-   - Enable Email/Password authentication
 
-### 6. OpenAI Configuration
+### OpenAI Setup
 
-1. **Get API Key**:
+1. **Get API Key**
    - Sign up at [OpenAI](https://openai.com/)
-   - Generate API key in dashboard
-   - Add to backend `.env`
-
-## 🚀 Development
-
-### Start Backend
-
-```bash
-cd BACKEND
-
-# Development mode
-npm run start:dev
-
-# Production build
-npm run build
-npm run start:prod
-```
-
-### Start Frontend
-
-```bash
-cd FRONTEND
-
-# Development mode
-npm run dev
-
-# Production build
-npm run build
-npm run preview
-```
+   - Generate an API key
+   - Add to backend environment variables
 
 ## 🚀 Deployment
 
-### Render Deployment
+### Vercel Deployment (Recommended)
 
-#### Backend Deployment
-
-1. **Connect Repository**:
-   - Connect your GitHub repo to Render
-   - Create new Web Service
-
-2. **Environment Variables**:
-   ```env
-   DATABASE_URL="your_production_postgres_url"
-   FIREBASE_SERVICE_ACCOUNT_BASE64="your_base64_service_account"
-   OPENAI_API_KEY="your_openai_api_key"
-   NODE_ENV="production"
-   ```
-
-3. **Build Commands**:
-   ```bash
-   Build Command: npm run build:prod
-   Start Command: npm run start:prod
-   ```
-
-#### Frontend Deployment
-
-1. **Create Static Site**:
-   - Connect same repository
+1. **Connect Repository**
+   - Connect your GitHub repository to Vercel
    - Set root directory to `FRONTEND`
 
-2. **Build Commands**:
-   ```bash
-   Build Command: npm run build
-   Publish Directory: dist
-   ```
+2. **Environment Variables**
+   - Add all frontend environment variables in Vercel dashboard
+   - Set `VITE_API_URL` to your backend URL
 
-3. **Environment Variables**:
-   ```env
-   VITE_API_URL="https://your-backend.onrender.com"
-   VITE_FIREBASE_API_KEY="your_firebase_api_key"
-   VITE_FIREBASE_AUTH_DOMAIN="your_project.firebaseapp.com"
-   VITE_FIREBASE_PROJECT_ID="your_project_id"
-   VITE_FIREBASE_STORAGE_BUCKET="your_project.appspot.com"
-   VITE_FIREBASE_MESSAGING_SENDER_ID="your_sender_id"
-   VITE_FIREBASE_APP_ID="your_app_id"
-   ```
+3. **Build Settings**
+   - Framework: Vite
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
 
-### Database Setup
+### Backend Deployment
 
-1. **Create PostgreSQL Database**:
-   - Use Render's PostgreSQL service
-   - Or external provider (Supabase, Railway, etc.)
+#### **Railway/Render**
+1. Connect your repository
+2. Set root directory to `BACKEND`
+3. Add environment variables
+4. Deploy
 
-2. **Run Migrations**:
-   ```bash
-   npx prisma migrate deploy
-   ```
-
-## 📖 Usage Guide
-
-### 1. Getting Started
-
-1. **Sign Up/Login**:
-   - Visit the application
-   - Sign up with email/password
-   - Login to access your projects
-
-2. **Create Your First Pitch Deck**:
-   - On the home page, describe your business idea
-   - Include details about market, problem, solution
-   - Click "Generate Pitch Deck"
-
-### 2. Editing Slides
-
-#### **Workspace View**
-- **Slide List**: Left sidebar shows all slides
-- **Active Slide**: Click any slide to edit it
-- **AI Chat**: Right sidebar for AI assistance
-- **Real-time Updates**: Changes save automatically
-
-#### **Slides View**
-- **Full Presentation**: View all slides together
-- **Edit Mode**: Click slides to edit content
-- **Export**: Generate PDF of presentation
-
-### 3. AI Assistant
-
-#### **Chat Interface**
-- **Context-Aware**: AI knows which slide you're editing
-- **Smart Suggestions**: Get content improvements
-- **Direct Updates**: AI can modify slide content
-- **Edit Mode**: Changes trigger edit mode for review
-
-#### **Example Prompts**
-```
-"Make this slide more compelling"
-"Add bullet points to the content"
-"Rewrite the title to be more impactful"
-"Add a hero image to this slide"
+#### **Heroku**
+```bash
+cd BACKEND
+heroku create your-app-name
+heroku config:set NODE_ENV=production
+git push heroku main
 ```
 
-### 4. Slide Management
+## 🛠️ Development
 
-#### **Reordering**
-1. **Drag & Drop**: Drag slides in the sidebar
-2. **Save/Cancel**: Buttons appear when order changes
-3. **Persistent**: Order saves when you leave/return
+### Available Scripts
 
-#### **Adding Slides**
-- Click "+" button in slide list
-- New slides appear at the end
-- Auto-detects appropriate icons
+#### **Frontend**
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
 
-### 5. Export & Sharing
+#### **Backend**
+```bash
+npm run start        # Start production server
+npm run start:dev    # Start development server
+npm run build        # Build TypeScript
+npm run test         # Run tests
+```
 
-#### **PDF Export**
-- Click "Export" button in navigation
-- Generates PDF with one slide per page
-- Downloads automatically to your device
+### Code Style
 
-#### **Project Management**
-- View all projects in "Projects" page
-- Rename projects anytime
-- Delete unused projects
+- **TypeScript**: Strict mode enabled
+- **ESLint**: Configured for React and TypeScript
+- **Prettier**: Code formatting
+- **Husky**: Git hooks for code quality
 
-## 🔧 API Documentation
+### Database Migrations
+
+```bash
+cd BACKEND
+npx prisma migrate dev    # Create and apply migration
+npx prisma generate      # Generate Prisma client
+npx prisma studio        # Open database GUI
+```
+
+## 🔒 Security
 
 ### Authentication
-All API endpoints require Firebase authentication:
-```
-Authorization: Bearer <firebase_id_token>
-```
+- Firebase Authentication with Google OAuth
+- JWT token validation
+- Secure API endpoints with guards
 
-### Endpoints
+### Data Protection
+- Environment variables for sensitive data
+- CORS configuration
+- Input validation and sanitization
+- Rate limiting on API endpoints
 
-#### **Generate Pitch Deck**
-```http
-POST /generate
-Content-Type: application/json
-
-{
-  "prompt": "Describe your business idea..."
-}
-```
-
-#### **Projects**
-```http
-GET /projects                    # List user projects
-POST /projects                   # Create new project
-GET /projects/:id               # Get project with slides
-PATCH /projects/:id             # Update project
-DELETE /projects/:id            # Delete project
-```
-
-#### **Slides**
-```http
-POST /slides                    # Create new slide
-PATCH /slides/:id              # Update slide
-PATCH /slides/reorder/:projectId # Reorder slides
-```
-
-#### **Chat**
-```http
-POST /chat                      # AI chat assistance
-```
+### Best Practices
+- HTTPS only in production
+- Secure headers configuration
+- Regular dependency updates
+- Security audits
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-#### **401 Authentication Errors**
-- Check Firebase configuration
-- Verify service account is base64 encoded
-- Ensure domain is in Firebase allowed domains
-
-#### **Database Connection Issues**
-- Verify DATABASE_URL is correct
-- Check PostgreSQL is running
-- Run `npx prisma db push` to sync schema
-
-#### **AI Generation Fails**
-- Verify OPENAI_API_KEY is set
-- Check API key has sufficient credits
-- Ensure prompt is detailed enough
-
-#### **Frontend Build Errors**
-- Clear node_modules and reinstall
-- Check TypeScript compilation
-- Verify environment variables
-
-### Development Tips
-
-#### **Backend Debugging**
+#### **Build Errors**
 ```bash
-# Check logs
-npm run start:dev
-
-# Test database connection
-npx prisma studio
-
-# Verify environment
-node -e "console.log(process.env)"
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
 ```
 
-#### **Frontend Debugging**
+#### **Database Connection**
 ```bash
-# Check build
-npm run build
-
-# Test production build
-npm run preview
-
-# Check environment variables
-console.log(import.meta.env)
+# Reset database
+npx prisma migrate reset
+npx prisma db push
 ```
 
+#### **Firebase Issues**
+- Verify service account JSON is base64 encoded
+- Check Firebase project settings
+- Ensure authentication is enabled
 
+#### **OpenAI API Errors**
+- Verify API key is correct
+- Check API usage limits
+- Ensure proper environment variable setup
 
----
+### Debug Mode
 
-**PitchDeck AI** - Transform ideas into compelling presentations with AI assistance. 
+Enable debug logging:
+```bash
+# Frontend
+DEBUG=true npm run dev
+
+# Backend
+DEBUG=true npm run start:dev
+```
+
+## 📚 API Documentation
+
+### Authentication Endpoints
+
+- `POST /auth/login` - User authentication
+- `GET /auth/verify` - Token verification
+
+### Project Endpoints
+
+- `GET /projects` - List user projects
+- `POST /projects` - Create new project
+- `GET /projects/:id` - Get project details
+- `PUT /projects/:id` - Update project
+- `DELETE /projects/:id` - Delete project
+
+### Slide Generation
+
+- `POST /generate` - Generate slides with AI
+- `GET /generate/health` - Health check
+- `GET /generate/auth-test` - Authentication test
+
+### Slide Management
+
+- `GET /slides/:projectId` - Get project slides
+- `POST /slides` - Create new slide
+- `PUT /slides/:id` - Update slide
+- `DELETE /slides/:id` - Delete slide
+
+## 🤝 Contributing
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Make your changes**
+4. **Run tests**
+   ```bash
+   npm run test
+   npm run lint
+   ```
+5. **Commit your changes**
+   ```bash
+   git commit -m 'Add amazing feature'
+   ```
+6. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+7. **Open a Pull Request**
+
+### Development Guidelines
+
+- Follow TypeScript best practices
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation
+- Follow the existing code style
+
