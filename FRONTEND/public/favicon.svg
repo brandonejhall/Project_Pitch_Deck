@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Main four-pointed star -->
+  <path d="M16 4 L18 14 L28 16 L18 18 L16 28 L14 18 L4 16 L14 14 Z" 
+        fill="#6B7280" 
+        stroke="#6B7280" 
+        stroke-width="1.5" 
+        stroke-linejoin="round"/>
+  
+  <!-- Top right dot -->
+  <circle cx="22" cy="10" r="2" fill="#6B7280"/>
+  
+  <!-- Bottom left dot -->
+  <circle cx="10" cy="22" r="2" fill="#6B7280"/>
+</svg> 
