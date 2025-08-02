@@ -31,30 +31,30 @@ export class FirebaseService implements OnModuleInit {
           credential: admin.credential.cert(serviceAccount),
         });
         
-        console.log('✅ Firebase Admin SDK initialized successfully');
-        console.log('📋 Project ID:', serviceAccount.project_id);
+        // console.log('✅ Firebase Admin SDK initialized successfully');
+        // console.log('📋 Project ID:', serviceAccount.project_id);
       } catch (error) {
         console.error('❌ Failed to initialize Firebase Admin SDK:', error);
         throw new Error(`Failed to initialize Firebase Admin SDK: ${error.message}`);
       }
     } else {
       this.app = admin.app();
-      console.log('✅ Using existing Firebase Admin SDK instance');
+      // console.log('✅ Using existing Firebase Admin SDK instance');
     }
   }
 
   async verifyIdToken(idToken: string): Promise<FirebaseUser> {
     try {
-      console.log('🔍 Verifying Firebase ID token...');
-      console.log('📝 Token length:', idToken.length);
-      console.log('📝 Token preview:', idToken.substring(0, 20) + '...');
+      // console.log('🔍 Verifying Firebase ID token...');
+      // console.log('📝 Token length:', idToken.length);
+      // console.log('📝 Token preview:', idToken.substring(0, 20) + '...');
       
       const decodedToken = await this.app.auth().verifyIdToken(idToken);
       
-      console.log('✅ Firebase token verification successful');
-      console.log('👤 User UID:', decodedToken.uid);
-      console.log('📧 User email:', decodedToken.email);
-      console.log('✅ Email verified:', decodedToken.email_verified);
+      // console.log('✅ Firebase token verification successful');
+      // console.log('👤 User UID:', decodedToken.uid);
+      // console.log('📧 User email:', decodedToken.email);
+      // console.log('✅ Email verified:', decodedToken.email_verified);
       
       return {
         uid: decodedToken.uid,

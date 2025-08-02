@@ -24,17 +24,17 @@ export class GenerateController {
   @ApiOperation({ summary: 'Generate pitch deck slides' })
   @ApiResponse({ status: 200, description: 'Slides generated successfully' })
   async generateSlides(@Body() body: GenerateRequestDto, @Request() req): Promise<GenerateResponse> {
-    console.log(`Received generate request with body:`, JSON.stringify(body));
-    console.log(`Prompt value: ${body.prompt}`);
-    console.log(`Prompt type: ${typeof body.prompt}`);
-    console.log(`Prompt length: ${body.prompt ? body.prompt.length : 'undefined'}`);
+    // console.log(`Received generate request with body:`, JSON.stringify(body));
+    // console.log(`Prompt value: ${body.prompt}`);
+    // console.log(`Prompt type: ${typeof body.prompt}`);
+    // console.log(`Prompt length: ${body.prompt ? body.prompt.length : 'undefined'}`);
     
     const userId = req.user.id;
     const prompt = body.prompt || 'Default business idea';
     
     // Generate slides
     const slides = await this.aiService.generatePitchDeck(prompt);
-    console.log(`Generated ${slides.length} slides`);
+    // console.log(`Generated ${slides.length} slides`);
     
     // Create project with generated slides
     try {
@@ -58,19 +58,19 @@ export class GenerateController {
         description: `Generated from prompt: ${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}`
       });
       
-      console.log(`Created project with ID: ${project.id}`);
+      // console.log(`Created project with ID: ${project.id}`);
       
       // Save generated slides to the database
-      console.log('Saving generated slides to database...');
+      // console.log('Saving generated slides to database...');
       const savedSlides = [];
       for (let i = 0; i < slides.length; i++) {
         const slide = slides[i];
-        console.log(`Processing slide ${i + 1}/${slides.length}:`, {
-          title: slide.title,
-          contentLength: slide.content.length,
-          position: i + 1,
-          projectId: project.id
-        });
+        // console.log(`Processing slide ${i + 1}/${slides.length}:`, {
+        //   title: slide.title,
+        //   contentLength: slide.content.length,
+        //   position: i + 1,
+        //   projectId: project.id
+        // });
         
         const savedSlide = await this.slidesService.createSlide(userId, {
           title: slide.title,
@@ -79,15 +79,15 @@ export class GenerateController {
           projectId: project.id
         });
         savedSlides.push(savedSlide);
-        console.log(`✅ Saved slide ${i + 1}/${slides.length}: ${slide.title} (ID: ${savedSlide.id})`);
+        // console.log(`✅ Saved slide ${i + 1}/${slides.length}: ${slide.title} (ID: ${savedSlide.id})`);
       }
       
-      console.log(`Successfully saved ${savedSlides.length} slides to database`);
+      // console.log(`Successfully saved ${savedSlides.length} slides to database`);
       
       // Verify the slides were saved by fetching the project
-      console.log('Verifying saved slides...');
+      // console.log('Verifying saved slides...');
       const verifyProject = await this.projectsService.getProject(userId, project.id);
-      console.log(`Verified project has ${verifyProject.slides?.length || 0} slides`);
+      // console.log(`Verified project has ${verifyProject.slides?.length || 0} slides`);
       
       return { 
         slides,
@@ -123,7 +123,7 @@ export class GenerateController {
   @Get('health')
   @ApiOperation({ summary: 'Health check endpoint' })
   async healthCheck() {
-    console.log('🏥 Health check endpoint called');
+    // console.log('🏥 Health check endpoint called');
     
     return {
       status: 'healthy',
@@ -137,8 +137,8 @@ export class GenerateController {
   @UseGuards(FirebaseAuthGuard)
   @ApiOperation({ summary: 'Test Firebase authentication' })
   async testAuth(@Request() req) {
-    console.log('🔐 Auth test endpoint called');
-    console.log('👤 User from request:', req.user);
+    // console.log('🔐 Auth test endpoint called');
+    // console.log('👤 User from request:', req.user);
     
     return {
       status: 'success',
